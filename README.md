@@ -1,8 +1,8 @@
-# Welcome to your Lovable project
+# Welcome to My project
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/d7c262ed-2caf-4abc-b3b4-8b0294929eda
+**URL**: https://tripsynergy-hub.lovable.app
 
 ## How can I edit this code?
 
