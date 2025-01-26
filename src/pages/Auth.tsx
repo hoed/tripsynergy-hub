@@ -141,9 +141,9 @@ const Auth = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="text-center text-sm text-gray-600">
-          By signing up, you agree to our Terms of Service and Privacy Policy<br>
-          <p>© 2025. Hoed's Project. All Right Reserved</p></br>
+        <CardFooter className="flex flex-col text-center text-sm text-gray-600 space-y-2">
+          <p>By signing up, you agree to our Terms of Service and Privacy Policy</p>
+          <p>© 2025. Hoed's Project. All Right Reserved</p>
         </CardFooter>
       </Card>
     </div>
