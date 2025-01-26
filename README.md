@@ -1,4 +1,4 @@
-# Welcome to My Travel System 
+# Welcome to My Travel System Project
 
 ## Project info
 
