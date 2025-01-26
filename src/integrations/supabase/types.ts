@@ -9,16 +9,253 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      accommodations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          location: string
+          name: string
+          price_per_night: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location: string
+          name: string
+          price_per_night: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location?: string
+          name?: string
+          price_per_night?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      attractions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          location: string
+          name: string
+          price_per_person: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location: string
+          name: string
+          price_per_person: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location?: string
+          name?: string
+          price_per_person?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          accommodation_id: string | null
+          attraction_id: string | null
+          client_id: string
+          created_at: string
+          end_date: string
+          id: string
+          meal_id: string | null
+          number_of_people: number
+          start_date: string
+          status: string
+          total_price: number
+          transportation_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          accommodation_id?: string | null
+          attraction_id?: string | null
+          client_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          meal_id?: string | null
+          number_of_people: number
+          start_date: string
+          status?: string
+          total_price: number
+          transportation_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accommodation_id?: string | null
+          attraction_id?: string | null
+          client_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          meal_id?: string | null
+          number_of_people?: number
+          start_date?: string
+          status?: string
+          total_price?: number
+          transportation_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_accommodation_id_fkey"
+            columns: ["accommodation_id"]
+            isOneToOne: false
+            referencedRelation: "accommodations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_attraction_id_fkey"
+            columns: ["attraction_id"]
+            isOneToOne: false
+            referencedRelation: "attractions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_meal_id_fkey"
+            columns: ["meal_id"]
+            isOneToOne: false
+            referencedRelation: "meals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_transportation_id_fkey"
+            columns: ["transportation_id"]
+            isOneToOne: false
+            referencedRelation: "transportation"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          price_per_person: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          price_per_person: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          price_per_person?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transportation: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          price_per_person: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          price_per_person: number
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          price_per_person?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: {
+          user_id: string
+        }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      is_staff: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "operator" | "marketing" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
