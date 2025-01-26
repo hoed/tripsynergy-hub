@@ -146,6 +146,9 @@ const Auth = () => {
         </CardFooter>
       </Card>
     </div>
+    <div>
+       © 2025. Hoed's Project. All Right Reserved
+    </div>
   );
 };
 
