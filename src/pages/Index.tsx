@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { ServicesGrid } from "@/components/ServicesGrid";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/components/AuthProvider";
 
 const Index = () => {
   const { toast } = useToast();
+  const { signOut } = useAuth();
   const [selectedTab, setSelectedTab] = useState("accommodations");
 
   const handleServiceSelect = (service: any) => {
@@ -16,7 +19,12 @@ const Index = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-4xl font-bold mb-8 text-center">Welcome to TripSynergy</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Welcome to TripSynergy</h1>
+        <Button variant="outline" onClick={signOut}>
+          Sign Out
+        </Button>
+      </div>
       
       <Tabs defaultValue="accommodations" className="w-full" onValueChange={setSelectedTab}>
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">

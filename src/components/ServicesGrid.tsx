@@ -2,18 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceCard } from "./ServiceCard";
 import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
 
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  location?: string;
-  price_per_night?: number;
-  price_per_person?: number;
-}
+type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
+
+type Service = 
+  | Database["public"]["Tables"]["accommodations"]["Row"]
+  | Database["public"]["Tables"]["transportation"]["Row"]
+  | Database["public"]["Tables"]["attractions"]["Row"]
+  | Database["public"]["Tables"]["meals"]["Row"];
 
 interface ServicesGridProps {
-  type: "accommodations" | "transportation" | "attractions" | "meals";
+  type: ServiceType;
   onSelect: (service: Service) => void;
 }
 
@@ -28,7 +28,7 @@ export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
         .select("*");
       
       if (error) throw error;
-      return data;
+      return data as Service[];
     },
   });
 
@@ -50,6 +50,23 @@ export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
     );
   }
 
+  const getServiceName = (service: Service) => {
+    if ('name' in service) return service.name;
+    if ('type' in service) return service.type;
+    return '';
+  };
+
+  const getServicePrice = (service: Service) => {
+    if ('price_per_night' in service) return service.price_per_night;
+    if ('price_per_person' in service) return service.price_per_person;
+    return 0;
+  };
+
+  const getServiceLocation = (service: Service) => {
+    if ('location' in service) return service.location;
+    return '';
+  };
+
   const getPriceLabel = () => {
     switch (type) {
       case "accommodations":
@@ -64,10 +81,10 @@ export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
       {services?.map((service) => (
         <ServiceCard
           key={service.id}
-          title={service.name}
+          title={getServiceName(service)}
           description={service.description || ""}
-          price={service.price_per_night || service.price_per_person || 0}
-          location={service.location}
+          price={getServicePrice(service)}
+          location={getServiceLocation(service)}
           priceLabel={getPriceLabel()}
           onSelect={() => onSelect(service)}
         />
