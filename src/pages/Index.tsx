@@ -11,7 +11,7 @@ const Index = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Welcome to TripSynergy</h1>
+        <h1 className="text-4xl font-bold">Be Your Tour Travel System</h1>
         <Button variant="outline" onClick={signOut}>
           Sign Out
         </Button>
