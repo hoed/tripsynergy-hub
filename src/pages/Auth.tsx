@@ -143,11 +143,9 @@ const Auth = () => {
         </CardContent>
         <CardFooter className="text-center text-sm text-gray-600">
           By signing up, you agree to our Terms of Service and Privacy Policy
+          <p>© 2025. Hoed's Project. All Right Reserved</p>
         </CardFooter>
       </Card>
-    </div>
-    <div>
-       © 2025. Hoed's Project. All Right Reserved
     </div>
   );
 };
