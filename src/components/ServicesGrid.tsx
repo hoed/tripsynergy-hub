@@ -50,25 +50,25 @@ export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
     );
   }
 
-  const getServiceName = (service: Service) => {
-    if ('name' in service) return service.name;
+  const getServiceName = (service: Service): string => {
     if ('type' in service) return service.type;
+    if ('name' in service) return service.name;
     return '';
   };
 
-  const getServicePrice = (service: Service) => {
+  const getServicePrice = (service: Service): number => {
     if ('price_per_night' in service) return service.price_per_night;
     if ('price_per_person' in service) return service.price_per_person;
     return 0;
   };
 
-  const getServiceLocation = (service: Service) => {
+  const getServiceLocation = (service: Service): string => {
     if ('location' in service) return service.location;
     return '';
   };
 
-  const getPriceLabel = () => {
-    switch (type) {
+  const getPriceLabel = (serviceType: ServiceType): string => {
+    switch (serviceType) {
       case "accommodations":
         return "per night";
       default:
@@ -85,7 +85,7 @@ export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
           description={service.description || ""}
           price={getServicePrice(service)}
           location={getServiceLocation(service)}
-          priceLabel={getPriceLabel()}
+          priceLabel={getPriceLabel(type)}
           onSelect={() => onSelect(service)}
         />
       ))}
