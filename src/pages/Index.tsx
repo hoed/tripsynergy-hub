@@ -2,20 +2,11 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ServicesGrid } from "@/components/ServicesGrid";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 
 const Index = () => {
-  const { toast } = useToast();
   const { signOut } = useAuth();
   const [selectedTab, setSelectedTab] = useState("accommodations");
-
-  const handleServiceSelect = (service: any) => {
-    toast({
-      title: "Service Selected",
-      description: `You selected ${service.name}. Booking functionality coming soon!`,
-    });
-  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -36,16 +27,16 @@ const Index = () => {
 
         <div className="mt-8">
           <TabsContent value="accommodations">
-            <ServicesGrid type="accommodations" onSelect={handleServiceSelect} />
+            <ServicesGrid type="accommodations" />
           </TabsContent>
           <TabsContent value="transportation">
-            <ServicesGrid type="transportation" onSelect={handleServiceSelect} />
+            <ServicesGrid type="transportation" />
           </TabsContent>
           <TabsContent value="attractions">
-            <ServicesGrid type="attractions" onSelect={handleServiceSelect} />
+            <ServicesGrid type="attractions" />
           </TabsContent>
           <TabsContent value="meals">
-            <ServicesGrid type="meals" onSelect={handleServiceSelect} />
+            <ServicesGrid type="meals" />
           </TabsContent>
         </div>
       </Tabs>

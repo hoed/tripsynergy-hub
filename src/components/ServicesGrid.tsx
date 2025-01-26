@@ -14,10 +14,9 @@ type Service =
 
 interface ServicesGridProps {
   type: ServiceType;
-  onSelect: (service: Service) => void;
 }
 
-export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
+export function ServicesGrid({ type }: ServicesGridProps) {
   const { toast } = useToast();
   
   const { data: services, isLoading, error } = useQuery({
@@ -81,12 +80,13 @@ export function ServicesGrid({ type, onSelect }: ServicesGridProps) {
       {services?.map((service) => (
         <ServiceCard
           key={service.id}
+          service={service}
+          serviceType={type}
           title={getServiceName(service)}
           description={service.description || ""}
           price={getServicePrice(service)}
           location={getServiceLocation(service)}
           priceLabel={getPriceLabel(type)}
-          onSelect={() => onSelect(service)}
         />
       ))}
     </div>
