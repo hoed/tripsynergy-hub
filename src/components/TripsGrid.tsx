@@ -106,7 +106,7 @@ export const TripsGrid = () => {
           id,
           user_id,
           role,
-          profiles:profiles!trip_participants_user_id_fkey (
+          profiles (
             full_name,
             email
           )
@@ -499,3 +499,4 @@ export const TripsGrid = () => {
     </div>
   );
 };
+
