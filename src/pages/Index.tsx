@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ServicesGrid } from "@/components/ServicesGrid";
+import { TripsGrid } from "@/components/TripsGrid";
 import { useAuth } from "@/components/AuthProvider";
 
 const Index = () => {
@@ -18,11 +19,12 @@ const Index = () => {
       </div>
       
       <Tabs defaultValue="accommodations" className="w-full" onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
           <TabsTrigger value="accommodations">Accommodations</TabsTrigger>
           <TabsTrigger value="transportation">Transportation</TabsTrigger>
           <TabsTrigger value="attractions">Attractions</TabsTrigger>
           <TabsTrigger value="meals">Meals</TabsTrigger>
+          <TabsTrigger value="trips">Trips</TabsTrigger>
         </TabsList>
 
         <div className="mt-8">
@@ -37,6 +39,9 @@ const Index = () => {
           </TabsContent>
           <TabsContent value="meals">
             <ServicesGrid type="meals" />
+          </TabsContent>
+          <TabsContent value="trips">
+            <TripsGrid />
           </TabsContent>
         </div>
       </Tabs>
