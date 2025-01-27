@@ -39,6 +39,18 @@ This project is built with .
 - shadcn-ui
 - Tailwind CSS
 
+## Configuration
+If the software is configurable, describe it in detail, either here or in other documentation to which you link.
+
+## Usage
+Show users how to use the software. Be specific. Use appropriate formatting when showing code snippets.
+
+## How to test the software
+If the software includes automated tests, detail how to run those tests.
+
+## Known issues
+Document any known significant shortcomings with the software.
+
 ## Getting involved
 This section should detail why people should get involved and describe key areas you are currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building important pieces, etc.
 
