@@ -4,6 +4,8 @@
 
 **URL**: https://tripsynergy-hub.lovable.app
 
+THis project is open source code, so anyone modify any changes.
+
 **Use your preferred IDE**
 
 If you want to work locally using your own IDE, you can clone this repo.
