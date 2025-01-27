@@ -106,7 +106,7 @@ export const TripsGrid = () => {
           id,
           user_id,
           role,
-          profiles (
+          profiles:profiles (
             full_name,
             email
           )
