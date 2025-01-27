@@ -41,14 +41,16 @@ type TripFormData = {
   end_date: string;
 };
 
+type Profile = {
+  full_name: string;
+  email: string;
+};
+
 type Participant = {
   id: string;
   user_id: string;
   role: string;
-  profiles: {
-    full_name: string;
-    email: string;
-  };
+  profiles: Profile;
 };
 
 export const TripsGrid = () => {
@@ -104,7 +106,7 @@ export const TripsGrid = () => {
           id,
           user_id,
           role,
-          profiles!trip_participants_user_id_fkey (
+          profiles:profiles!trip_participants_user_id_fkey (
             full_name,
             email
           )
