@@ -59,7 +59,6 @@ General instructions on how to contribute should be stated with a link to [CONTR
 ## Open source licensing info
 - [TERMS](https://github.com/hoed/tripsynergy-hub/blob/main/TERMS.md)
 - [LICENSE](https://github.com/hoed/tripsynergy-hub/blob/main/LICENSE)
-- CFPB Source Code Policy
 
 ## Credits and references
 - Projects that inspired you
