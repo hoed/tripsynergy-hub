@@ -42,7 +42,7 @@ This project is built with .
 ## Getting involved
 This section should detail why people should get involved and describe key areas you are currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building important pieces, etc.
 
-General instructions on how to contribute should be stated with a link to [CONTRIBUTING](https://github.com/hoed/tripsynergy-hub/CONTRIBUTING.md).
+General instructions on how to contribute should be stated with a link to [CONTRIBUTING](https://github.com/hoed/tripsynergy-hub/blob/main/CONTRIBUTING.md).
 
 ## Open source licensing info
 - TERMS
