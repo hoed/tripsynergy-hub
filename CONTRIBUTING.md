@@ -35,10 +35,10 @@ and patterns in the existing code-base.
 ## Browser support
 
 We configure our build chain tools
-(typically [Autoprefixer](https://github.com/hoed/tripsynergy-hub)
-and [Babel](https://tripsynergy-hub.lovable.app/))
+(typically [Github Code](https://github.com/hoed/tripsynergy-hub)
+and [Apps](https://tripsynergy-hub.lovable.app/))
 to support a reasonable set of backward compatibility with older browsers.
 
 Please read up on
-[our current browser support guidance](https://github.com/cfpb/development/blob/main/guides/browser-support.md)
+[our current browser support guidance](https://github.com/hoed/tripsynergy-hub/blob/main/guides/browser-support.md)
 and follow it when contributing to this project.
