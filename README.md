@@ -4,7 +4,7 @@
 
 **URL**: https://tripsynergy-hub.lovable.app
 
-THis project is open source code, so anyone modify any changes.
+THis project is open source code, anyone can modify this project code.
 I would be thank for anyone who participate for updating this code.
 
 **Use your preferred IDE**
