@@ -106,12 +106,13 @@ export const TripsGrid = () => {
           id,
           user_id,
           role,
-          profiles (
+          profiles:profiles(
             full_name,
             email
           )
         `)
-        .eq("trip_id", selectedTrip.id);
+        .eq("trip_id", selectedTrip.id)
+        .returns<Participant[]>();
 
       if (error) {
         toast({
@@ -122,7 +123,7 @@ export const TripsGrid = () => {
         return [];
       }
 
-      return data as Participant[];
+      return data;
     },
   });
 
@@ -499,4 +500,3 @@ export const TripsGrid = () => {
     </div>
   );
 };
-
