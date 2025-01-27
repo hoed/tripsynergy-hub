@@ -5,6 +5,7 @@
 **URL**: https://tripsynergy-hub.lovable.app
 
 THis project is open source code, so anyone modify any changes.
+I would be thank for anyone who participate for updating this code.
 
 **Use your preferred IDE**
 
@@ -37,4 +38,18 @@ This project is built with .
 - React
 - shadcn-ui
 - Tailwind CSS
+
+## Getting involved
+This section should detail why people should get involved and describe key areas you are currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building important pieces, etc.
+
+## General instructions on how to contribute should be stated with a link to CONTRIBUTING.
+
+## Open source licensing info
+TERMS
+LICENSE
+CFPB Source Code Policy
+Credits and references
+Projects that inspired you
+Related projects
+Books, papers, talks, or other sources that have meaningful impact or influence on this project
 
