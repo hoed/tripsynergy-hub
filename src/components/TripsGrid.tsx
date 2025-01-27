@@ -74,7 +74,12 @@ export const TripsGrid = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trips")
-        .select("*, profiles(role)");
+        .select(`
+          *,
+          creator:created_by (
+            role
+          )
+        `);
 
       if (error) {
         toast({
@@ -99,7 +104,7 @@ export const TripsGrid = () => {
           id,
           user_id,
           role,
-          profiles:user_id (
+          profiles (
             full_name,
             email
           )
