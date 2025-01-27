@@ -9,11 +9,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 
 interface ServiceFormData {
-  name?: string;
-  type?: string;
+  name: string;
+  type: string;
   description: string;
   price: number;
-  location?: string;
+  location: string;
 }
 
 interface ServiceManagementFormProps {
@@ -49,14 +49,33 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
     setIsSubmitting(true);
 
     try {
-      const serviceData = {
-        ...data,
-        created_by: session.user.id,
-        ...(serviceType === "accommodations" 
-          ? { price_per_night: data.price }
-          : { price_per_person: data.price }
-        ),
-      };
+      let serviceData;
+      
+      if (serviceType === "accommodations") {
+        serviceData = {
+          name: data.name,
+          description: data.description,
+          location: data.location,
+          price_per_night: data.price,
+          created_by: session.user.id,
+        };
+      } else if (serviceType === "transportation") {
+        serviceData = {
+          type: data.type,
+          description: data.description,
+          price_per_person: data.price,
+          created_by: session.user.id,
+        };
+      } else {
+        // For attractions and meals
+        serviceData = {
+          name: data.name,
+          description: data.description,
+          price_per_person: data.price,
+          created_by: session.user.id,
+          ...(serviceType === "attractions" ? { location: data.location } : {}),
+        };
+      }
 
       const { error } = await supabase
         .from(serviceType)

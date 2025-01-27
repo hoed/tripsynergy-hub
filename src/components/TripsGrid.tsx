@@ -95,7 +95,15 @@ export const TripsGrid = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_participants")
-        .select("*, profiles(full_name, email)")
+        .select(`
+          id,
+          user_id,
+          role,
+          profiles:user_id (
+            full_name,
+            email
+          )
+        `)
         .eq("trip_id", selectedTrip.id);
 
       if (error) {
