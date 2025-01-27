@@ -106,7 +106,7 @@ export const TripsGrid = () => {
           id,
           user_id,
           role,
-          profiles (
+          profiles:user_id (
             full_name,
             email
           )
@@ -200,7 +200,6 @@ export const TripsGrid = () => {
 
   const addParticipantMutation = useMutation({
     mutationFn: async ({ tripId, email }: { tripId: string; email: string }) => {
-      // First get the user ID from the profiles table
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("id")
