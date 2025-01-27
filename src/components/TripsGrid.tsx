@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/components/AuthProvider";
 
@@ -41,12 +41,24 @@ type TripFormData = {
   end_date: string;
 };
 
+type Participant = {
+  id: string;
+  user_id: string;
+  role: string;
+  profiles: {
+    full_name: string;
+    email: string;
+  } | null;
+};
+
 export const TripsGrid = () => {
   const { toast } = useToast();
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const [selectedTrip, setSelectedTrip] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isParticipantsDialogOpen, setIsParticipantsDialogOpen] = useState(false);
+  const [participantsEmail, setParticipantsEmail] = useState("");
 
   const form = useForm<TripFormData>({
     defaultValues: {
@@ -74,6 +86,28 @@ export const TripsGrid = () => {
       }
 
       return data;
+    },
+  });
+
+  const { data: participants } = useQuery({
+    queryKey: ["participants", selectedTrip?.id],
+    enabled: !!selectedTrip?.id && isParticipantsDialogOpen,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trip_participants")
+        .select("*, profiles(full_name, email)")
+        .eq("trip_id", selectedTrip.id);
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching participants",
+          description: error.message,
+        });
+        return [];
+      }
+
+      return data as Participant[];
     },
   });
 
@@ -149,6 +183,68 @@ export const TripsGrid = () => {
     },
   });
 
+  const addParticipantMutation = useMutation({
+    mutationFn: async ({ tripId, email }: { tripId: string; email: string }) => {
+      // First get the user ID from the profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (!profileData) {
+        throw new Error("User not found");
+      }
+
+      const { error } = await supabase.from("trip_participants").insert({
+        trip_id: tripId,
+        user_id: profileData.id,
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participants"] });
+      toast({
+        title: "Participant added successfully",
+      });
+      setParticipantsEmail("");
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error adding participant",
+        description: error.message,
+      });
+    },
+  });
+
+  const removeParticipantMutation = useMutation({
+    mutationFn: async (participantId: string) => {
+      const { error } = await supabase
+        .from("trip_participants")
+        .delete()
+        .eq("id", participantId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["participants"] });
+      toast({
+        title: "Participant removed successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error removing participant",
+        description: error.message,
+      });
+    },
+  });
+
   const onSubmit = (data: TripFormData) => {
     if (selectedTrip) {
       updateTripMutation.mutate({ ...data, id: selectedTrip.id });
@@ -171,6 +267,21 @@ export const TripsGrid = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this trip?")) {
       deleteTripMutation.mutate(id);
+    }
+  };
+
+  const handleParticipantsClick = (trip: any) => {
+    setSelectedTrip(trip);
+    setIsParticipantsDialogOpen(true);
+  };
+
+  const handleAddParticipant = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedTrip && participantsEmail) {
+      addParticipantMutation.mutate({
+        tripId: selectedTrip.id,
+        email: participantsEmail,
+      });
     }
   };
 
@@ -267,6 +378,61 @@ export const TripsGrid = () => {
         </Dialog>
       </div>
 
+      <Dialog
+        open={isParticipantsDialogOpen}
+        onOpenChange={setIsParticipantsDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Participants</DialogTitle>
+            <DialogDescription>
+              Add or remove participants from this trip.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleAddParticipant} className="space-y-4">
+            <FormItem>
+              <FormLabel>Add Participant by Email</FormLabel>
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  value={participantsEmail}
+                  onChange={(e) => setParticipantsEmail(e.target.value)}
+                  placeholder="Enter email address"
+                />
+                <Button type="submit">Add</Button>
+              </div>
+            </FormItem>
+          </form>
+
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">Current Participants</h4>
+            {participants?.map((participant) => (
+              <div
+                key={participant.id}
+                className="flex items-center justify-between"
+              >
+                <div>
+                  <p className="text-sm font-medium">
+                    {participant.profiles?.full_name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {participant.profiles?.email}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeParticipantMutation.mutate(participant.id)}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {trips?.map((trip) => (
           <Card key={trip.id} className="flex flex-col">
@@ -291,7 +457,11 @@ export const TripsGrid = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-2 mt-auto">
-              <Button variant="outline" size="icon">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handleParticipantsClick(trip)}
+              >
                 <Users className="h-4 w-4" />
               </Button>
               <Button
