@@ -45,7 +45,7 @@ This section should detail why people should get involved and describe key areas
 General instructions on how to contribute should be stated with a link to [CONTRIBUTING](https://github.com/hoed/tripsynergy-hub/blob/main/CONTRIBUTING.md).
 
 ## Open source licensing info
-- TERMS
+- [TERMS](https://github.com/hoed/tripsynergy-hub/blob/main/TERMS.md)
 - LICENSE
 - CFPB Source Code Policy
 
