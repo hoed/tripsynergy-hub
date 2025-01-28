@@ -17,6 +17,8 @@ type TripFormData = {
   description: string;
   start_date: string;
   end_date: string;
+  profit_percentage?: number;
+  total_price?: number;
 };
 
 interface TripFormProps {
@@ -32,6 +34,8 @@ export const TripForm = ({ defaultValues, onSubmit, submitLabel }: TripFormProps
       description: "",
       start_date: "",
       end_date: "",
+      profit_percentage: 0,
+      total_price: 0,
     },
   });
 
@@ -85,6 +89,40 @@ export const TripForm = ({ defaultValues, onSubmit, submitLabel }: TripFormProps
               <FormLabel>End Date</FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="profit_percentage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profit Percentage</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  {...field} 
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="total_price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Total Price</FormLabel>
+              <FormControl>
+                <Input 
+                  type="number" 
+                  {...field} 
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -1,4 +1,4 @@
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, DollarSign, Percent } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -17,6 +17,8 @@ interface TripCardProps {
     start_date: string;
     end_date: string;
     status: string | null;
+    profit_percentage: number | null;
+    total_price: number | null;
   };
   onEdit: (trip: any) => void;
   onDelete: (id: string) => void;
@@ -43,6 +45,16 @@ export const TripCard = ({ trip, onEdit, onDelete }: TripCardProps) => {
             <span className="font-medium">Status:</span>{" "}
             <span className="capitalize">{trip.status}</span>
           </p>
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            <span className="font-medium">Total Price:</span>{" "}
+            {trip.total_price ? `$${trip.total_price.toFixed(2)}` : "N/A"}
+          </div>
+          <div className="flex items-center gap-2">
+            <Percent className="h-4 w-4" />
+            <span className="font-medium">Profit:</span>{" "}
+            {trip.profit_percentage ? `${trip.profit_percentage}%` : "N/A"}
+          </div>
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2 mt-auto">
