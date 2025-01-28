@@ -242,34 +242,43 @@ export type Database = {
         }
         Relationships: []
       }
-      trip_participants: {
+      trip_additionals: {
         Row: {
           created_at: string
+          description: string | null
           id: string
-          role: string
-          trip_id: string
+          name: string
+          price_per_unit: number
+          total_price: number
+          trip_id: string | null
+          units: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
-          role?: string
-          trip_id: string
+          name: string
+          price_per_unit: number
+          total_price: number
+          trip_id?: string | null
+          units: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
-          role?: string
-          trip_id?: string
+          name?: string
+          price_per_unit?: number
+          total_price?: number
+          trip_id?: string | null
+          units?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "trip_participants_trip_id_fkey"
+            foreignKeyName: "trip_additionals_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
@@ -284,9 +293,11 @@ export type Database = {
           description: string | null
           end_date: string
           id: string
+          profit_percentage: number | null
           start_date: string
           status: string | null
           title: string
+          total_price: number | null
           updated_at: string
         }
         Insert: {
@@ -295,9 +306,11 @@ export type Database = {
           description?: string | null
           end_date: string
           id?: string
+          profit_percentage?: number | null
           start_date: string
           status?: string | null
           title: string
+          total_price?: number | null
           updated_at?: string
         }
         Update: {
@@ -306,9 +319,11 @@ export type Database = {
           description?: string | null
           end_date?: string
           id?: string
+          profit_percentage?: number | null
           start_date?: string
           status?: string | null
           title?: string
+          total_price?: number | null
           updated_at?: string
         }
         Relationships: []
