@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,8 +12,33 @@ import { useAuth } from "@/components/AuthProvider";
 export function ProfileAvatar() {
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (user?.id) {
+      downloadImage(user.id);
+    }
+  }, [user]);
+
+  const downloadImage = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .download(`${userId}`);
+        
+      if (error) {
+        console.error('Error downloading image:', error);
+        return;
+      }
+
+      const url = URL.createObjectURL(data);
+      setAvatarUrl(url);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+    }
+  };
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -25,7 +50,7 @@ export function ProfileAvatar() {
 
       const file = event.target.files[0];
       const fileExt = file.name.split(".").pop();
-      const filePath = `${user?.id}.${fileExt}`;
+      const filePath = `${user?.id}`;
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
@@ -35,14 +60,17 @@ export function ProfileAvatar() {
         throw uploadError;
       }
 
+      // Download the new image
+      await downloadImage(user?.id as string);
+
       toast({
         title: "Success",
         description: "Avatar updated successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Error uploading avatar",
+        description: error.message || "Error uploading avatar",
         variant: "destructive",
       });
     } finally {
@@ -50,10 +78,6 @@ export function ProfileAvatar() {
       setIsOpen(false);
     }
   };
-
-  const avatarUrl = user?.id 
-    ? `${supabase.storage.from("avatars").getPublicUrl(`${user.id}`).data.publicUrl}`
-    : null;
 
   return (
     <div className="flex items-center gap-4">
