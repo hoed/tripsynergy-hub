@@ -1,4 +1,5 @@
-import { Edit, Trash2, DollarSign, Percent } from "lucide-react";
+import { useState } from "react";
+import { Edit, Trash2, DollarSign, Percent, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,6 +9,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { TripAdditionalsForm } from "./TripAdditionalsForm";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TripCardProps {
   trip: {
@@ -25,6 +36,26 @@ interface TripCardProps {
 }
 
 export const TripCard = ({ trip, onEdit, onDelete }: TripCardProps) => {
+  const [showAdditionalsDialog, setShowAdditionalsDialog] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: additionals } = useQuery({
+    queryKey: ["trip-additionals", trip.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trip_additionals")
+        .select("*")
+        .eq("trip_id", trip.id);
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleAdditionalsSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["trip-additionals", trip.id] });
+  };
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -55,9 +86,42 @@ export const TripCard = ({ trip, onEdit, onDelete }: TripCardProps) => {
             <span className="font-medium">Profit:</span>{" "}
             {trip.profit_percentage ? `${trip.profit_percentage}%` : "N/A"}
           </div>
+
+          {additionals && additionals.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-medium mb-2">Additional Items:</h4>
+              <ul className="space-y-2">
+                {additionals.map((item) => (
+                  <li key={item.id} className="flex justify-between items-center">
+                    <span>{item.name}</span>
+                    <span>${item.total_price.toFixed(2)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2 mt-auto">
+        <Dialog open={showAdditionalsDialog} onOpenChange={setShowAdditionalsDialog}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Additional Item</DialogTitle>
+            </DialogHeader>
+            <TripAdditionalsForm
+              tripId={trip.id}
+              onSuccess={() => {
+                handleAdditionalsSuccess();
+                setShowAdditionalsDialog(false);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
         <Button
           variant="outline"
           size="icon"
