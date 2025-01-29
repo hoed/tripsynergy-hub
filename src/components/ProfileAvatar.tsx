@@ -24,9 +24,18 @@ export function ProfileAvatar() {
 
   const downloadImage = async (userId: string) => {
     try {
+      const { data: files } = await supabase.storage
+        .from('avatars')
+        .list(userId);
+
+      if (!files || files.length === 0) {
+        console.log('No avatar found');
+        return;
+      }
+
       const { data, error } = await supabase.storage
         .from('avatars')
-        .download(`${userId}`);
+        .download(`${userId}/${files[0].name}`);
         
       if (error) {
         console.error('Error downloading image:', error);
@@ -50,8 +59,21 @@ export function ProfileAvatar() {
 
       const file = event.target.files[0];
       const fileExt = file.name.split(".").pop();
-      const filePath = `${user?.id}`;
+      const fileName = `avatar.${fileExt}`;
+      const filePath = `${user?.id}/${fileName}`;
 
+      // Delete existing avatar files first
+      const { data: existingFiles } = await supabase.storage
+        .from("avatars")
+        .list(user?.id as string);
+
+      if (existingFiles && existingFiles.length > 0) {
+        await supabase.storage
+          .from("avatars")
+          .remove(existingFiles.map(f => `${user?.id}/${f.name}`));
+      }
+
+      // Upload new avatar
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file, { upsert: true });
