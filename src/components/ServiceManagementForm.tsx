@@ -14,6 +14,10 @@ interface ServiceFormData {
   description: string;
   price: number;
   location: string;
+  nights?: number;
+  persons?: number;
+  days?: number;
+  totalPrice?: number;
 }
 
 interface ServiceManagementFormProps {
@@ -25,6 +29,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
   const { session } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const form = useForm<ServiceFormData>({
     defaultValues: {
@@ -33,8 +38,24 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
       description: "",
       price: 0,
       location: "",
+      nights: 1,
+      persons: 1,
+      days: 1,
     },
   });
+
+  const calculateTotal = (data: ServiceFormData) => {
+    let total = 0;
+    if (serviceType === "accommodations") {
+      total = data.price * (data.nights || 1) * (data.persons || 1);
+    } else if (serviceType === "transportation") {
+      total = data.price * (data.days || 1);
+    } else if (serviceType === "attractions" || serviceType === "meals") {
+      total = data.price * (data.persons || 1);
+    }
+    setTotalPrice(total);
+    return total;
+  };
 
   const onSubmit = async (data: ServiceFormData) => {
     if (!session?.user?.id) {
@@ -50,6 +71,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
 
     try {
       let serviceData;
+      const total = calculateTotal(data);
       
       if (serviceType === "accommodations") {
         serviceData = {
@@ -67,7 +89,6 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
           created_by: session.user.id,
         };
       } else {
-        // For attractions and meals
         serviceData = {
           name: data.name,
           description: data.description,
@@ -159,12 +180,106 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
                 <Input 
                   type="number" 
                   {...field} 
-                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                  onChange={(e) => {
+                    field.onChange(parseFloat(e.target.value));
+                    calculateTotal({ ...form.getValues(), price: parseFloat(e.target.value) });
+                  }}
                 />
               </FormControl>
             </FormItem>
           )}
         />
+
+        {serviceType === "accommodations" && (
+          <>
+            <FormField
+              control={form.control}
+              name="nights"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of Nights</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      min={1}
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(parseInt(e.target.value));
+                        calculateTotal({ ...form.getValues(), nights: parseInt(e.target.value) });
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="persons"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of Persons</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      min={1}
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(parseInt(e.target.value));
+                        calculateTotal({ ...form.getValues(), persons: parseInt(e.target.value) });
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </>
+        )}
+
+        {serviceType === "transportation" && (
+          <FormField
+            control={form.control}
+            name="days"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Number of Days</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min={1}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(parseInt(e.target.value));
+                      calculateTotal({ ...form.getValues(), days: parseInt(e.target.value) });
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
+
+        {(serviceType === "attractions" || serviceType === "meals") && (
+          <FormField
+            control={form.control}
+            name="persons"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Number of Persons</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min={1}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(parseInt(e.target.value));
+                      calculateTotal({ ...form.getValues(), persons: parseInt(e.target.value) });
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
 
         {(serviceType === "accommodations" || serviceType === "attractions") && (
           <FormField
@@ -180,6 +295,10 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
             )}
           />
         )}
+
+        <div className="text-lg font-semibold">
+          Total Price: ${totalPrice.toFixed(2)}
+        </div>
 
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Creating..." : "Create Service"}
