@@ -17,7 +17,6 @@ interface ServiceFormData {
   nights?: number;
   persons?: number;
   days?: number;
-  totalPrice?: number;
 }
 
 interface ServiceManagementFormProps {
