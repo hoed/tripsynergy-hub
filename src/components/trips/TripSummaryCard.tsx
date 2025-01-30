@@ -7,19 +7,17 @@ interface TripSummaryCardProps {
   tripId: string;
 }
 
-type BookingWithDetails = {
-  id: string;
-  total_price: number;
-  accommodation: Database['public']['Tables']['accommodations']['Row'] | null;
-  transportation: Database['public']['Tables']['transportation']['Row'] | null;
-  attraction: Database['public']['Tables']['attractions']['Row'] | null;
-  meal: Database['public']['Tables']['meals']['Row'] | null;
-}
+type Booking = Database['public']['Tables']['bookings']['Row'] & {
+  accommodation?: Database['public']['Tables']['accommodations']['Row'];
+  transportation?: Database['public']['Tables']['transportation']['Row'];
+  attraction?: Database['public']['Tables']['attractions']['Row'];
+  meal?: Database['public']['Tables']['meals']['Row'];
+};
 
 type Additional = Database['public']['Tables']['trip_additionals']['Row'];
 
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
-  const { data: bookings } = useQuery<BookingWithDetails[]>({
+  const { data: bookings } = useQuery<Booking[]>({
     queryKey: ["trip-bookings", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
