@@ -35,7 +35,6 @@ const Auth = () => {
 
       if (error) throw error;
 
-      // Check if the user was created successfully
       if (data.user) {
         toast({
           title: "Success!",
@@ -60,28 +59,16 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: { session }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (signInError) throw signInError;
 
-      // Check if the user has a valid session
-      if (data.session) {
-        // Get the user's profile to verify their role
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.session.user.id)
-          .single();
-
-        if (profileError) {
-          console.error("Profile fetch error:", profileError);
-          throw new Error("Could not verify user role");
-        }
-
-        console.log("User role:", profileData?.role);
+      if (session) {
+        // Instead of fetching the profile directly, we'll just redirect
+        // The AuthProvider will handle the session management
         navigate("/");
       }
       
