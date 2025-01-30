@@ -6,40 +6,39 @@ interface TripSummaryCardProps {
   tripId: string;
 }
 
-// Define simplified types for the joined data
-type SimpleBooking = {
+interface BookingDetails {
   id: string;
   total_price: number;
-  accommodation?: {
+  accommodation: {
     id: string;
     name: string;
     price_per_night: number;
-  };
-  transportation?: {
+  } | null;
+  transportation: {
     id: string;
     type: string;
     price_per_person: number;
-  };
-  attraction?: {
+  } | null;
+  attraction: {
     id: string;
     name: string;
     price_per_person: number;
-  };
-  meal?: {
+  } | null;
+  meal: {
     id: string;
     name: string;
     price_per_person: number;
-  };
-};
+  } | null;
+}
 
-type TripAdditional = {
+interface TripAdditional {
   id: string;
   name: string;
   total_price: number;
-};
+}
 
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
-  const { data: bookings } = useQuery<SimpleBooking[]>({
+  const { data: bookings } = useQuery<BookingDetails[]>({
     queryKey: ["trip-bookings", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
