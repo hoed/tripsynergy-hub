@@ -15,7 +15,7 @@ export function Logo({ className, size = "md" }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <img
-        src="/public/mylogo.png"
+        src="/mylogo.png"
         alt="Logo"
         className={cn(
           "object-contain transition-all",
