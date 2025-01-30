@@ -6,8 +6,39 @@ interface TripSummaryCardProps {
   tripId: string;
 }
 
+interface Booking {
+  id: string;
+  total_price: number;
+  accommodation?: {
+    id: string;
+    name: string;
+    price_per_night: number;
+  };
+  transportation?: {
+    id: string;
+    type: string;
+    price_per_person: number;
+  };
+  attraction?: {
+    id: string;
+    name: string;
+    price_per_person: number;
+  };
+  meal?: {
+    id: string;
+    name: string;
+    price_per_person: number;
+  };
+}
+
+interface Additional {
+  id: string;
+  name: string;
+  total_price: number;
+}
+
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
-  const { data: bookings } = useQuery({
+  const { data: bookings } = useQuery<Booking[]>({
     queryKey: ["trip-bookings", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -26,7 +57,7 @@ export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
     },
   });
 
-  const { data: additionals } = useQuery({
+  const { data: additionals } = useQuery<Additional[]>({
     queryKey: ["trip-additionals", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
