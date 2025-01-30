@@ -1,44 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
 
 interface TripSummaryCardProps {
   tripId: string;
 }
 
-interface Booking {
+type BookingWithDetails = {
   id: string;
   total_price: number;
-  accommodation?: {
-    id: string;
-    name: string;
-    price_per_night: number;
-  };
-  transportation?: {
-    id: string;
-    type: string;
-    price_per_person: number;
-  };
-  attraction?: {
-    id: string;
-    name: string;
-    price_per_person: number;
-  };
-  meal?: {
-    id: string;
-    name: string;
-    price_per_person: number;
-  };
+  accommodation: Database['public']['Tables']['accommodations']['Row'] | null;
+  transportation: Database['public']['Tables']['transportation']['Row'] | null;
+  attraction: Database['public']['Tables']['attractions']['Row'] | null;
+  meal: Database['public']['Tables']['meals']['Row'] | null;
 }
 
-interface Additional {
-  id: string;
-  name: string;
-  total_price: number;
-}
+type Additional = Database['public']['Tables']['trip_additionals']['Row'];
 
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
-  const { data: bookings } = useQuery<Booking[]>({
+  const { data: bookings } = useQuery<BookingWithDetails[]>({
     queryKey: ["trip-bookings", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
