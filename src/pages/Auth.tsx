@@ -23,7 +23,7 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -35,12 +35,16 @@ const Auth = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success!",
-        description: "Please check your email to verify your account.",
-      });
+      // Check if the user was created successfully
+      if (data.user) {
+        toast({
+          title: "Success!",
+          description: "Please check your email to verify your account.",
+        });
+      }
       
     } catch (error: any) {
+      console.error("Signup error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -56,16 +60,33 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
-      navigate("/");
+      // Check if the user has a valid session
+      if (data.session) {
+        // Get the user's profile to verify their role
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          throw new Error("Could not verify user role");
+        }
+
+        console.log("User role:", profileData?.role);
+        navigate("/");
+      }
       
     } catch (error: any) {
+      console.error("Signin error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -88,6 +109,7 @@ const Auth = () => {
 
       if (error) throw error;
     } catch (error: any) {
+      console.error("Google signin error:", error);
       toast({
         variant: "destructive",
         title: "Error",
