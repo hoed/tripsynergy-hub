@@ -7,17 +7,15 @@ interface TripSummaryCardProps {
   tripId: string;
 }
 
-type Booking = Database['public']['Tables']['bookings']['Row'] & {
+type BookingWithDetails = Database['public']['Tables']['bookings']['Row'] & {
   accommodation?: Database['public']['Tables']['accommodations']['Row'];
   transportation?: Database['public']['Tables']['transportation']['Row'];
   attraction?: Database['public']['Tables']['attractions']['Row'];
   meal?: Database['public']['Tables']['meals']['Row'];
 };
 
-type Additional = Database['public']['Tables']['trip_additionals']['Row'];
-
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
-  const { data: bookings } = useQuery<Booking[]>({
+  const { data: bookings } = useQuery<BookingWithDetails[]>({
     queryKey: ["trip-bookings", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -36,7 +34,7 @@ export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
     },
   });
 
-  const { data: additionals } = useQuery<Additional[]>({
+  const { data: additionals } = useQuery<Database['public']['Tables']['trip_additionals']['Row'][]>({
     queryKey: ["trip-additionals", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -52,12 +50,10 @@ export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
   const calculateTotalPrice = () => {
     let total = 0;
 
-    // Add booking costs
     bookings?.forEach((booking) => {
       total += booking.total_price || 0;
     });
 
-    // Add additional service costs
     additionals?.forEach((additional) => {
       total += additional.total_price || 0;
     });
