@@ -16,7 +16,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TripAdditionalsForm } from "./TripAdditionalsForm";
+import { AdditionalServiceCard } from "./AdditionalServiceCard";
+import { TripSummaryCard } from "./TripSummaryCard";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -37,6 +38,7 @@ interface TripCardProps {
 
 export const TripCard = ({ trip, onEdit, onDelete }: TripCardProps) => {
   const [showAdditionalsDialog, setShowAdditionalsDialog] = useState(false);
+  const [showSummaryDialog, setShowSummaryDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: additionals } = useQuery({
@@ -54,6 +56,7 @@ export const TripCard = ({ trip, onEdit, onDelete }: TripCardProps) => {
 
   const handleAdditionalsSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ["trip-additionals", trip.id] });
+    setShowAdditionalsDialog(false);
   };
 
   return (
@@ -113,15 +116,27 @@ export const TripCard = ({ trip, onEdit, onDelete }: TripCardProps) => {
             <DialogHeader>
               <DialogTitle>Add Additional Item</DialogTitle>
             </DialogHeader>
-            <TripAdditionalsForm
+            <AdditionalServiceCard
               tripId={trip.id}
-              onSuccess={() => {
-                handleAdditionalsSuccess();
-                setShowAdditionalsDialog(false);
-              }}
+              onAdd={handleAdditionalsSuccess}
             />
           </DialogContent>
         </Dialog>
+
+        <Dialog open={showSummaryDialog} onOpenChange={setShowSummaryDialog}>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              View Summary
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Trip Summary</DialogTitle>
+            </DialogHeader>
+            <TripSummaryCard tripId={trip.id} />
+          </DialogContent>
+        </Dialog>
+
         <Button
           variant="outline"
           size="icon"
