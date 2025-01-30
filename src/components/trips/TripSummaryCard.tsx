@@ -7,12 +7,21 @@ interface TripSummaryCardProps {
   tripId: string;
 }
 
-type BookingWithDetails = Database['public']['Tables']['bookings']['Row'] & {
-  accommodation?: Database['public']['Tables']['accommodations']['Row'];
-  transportation?: Database['public']['Tables']['transportation']['Row'];
-  attraction?: Database['public']['Tables']['attractions']['Row'];
-  meal?: Database['public']['Tables']['meals']['Row'];
-};
+// Define base table types
+type Tables = Database['public']['Tables'];
+type BookingRow = Tables['bookings']['Row'];
+type AccommodationRow = Tables['accommodations']['Row'];
+type TransportationRow = Tables['transportation']['Row'];
+type AttractionRow = Tables['attractions']['Row'];
+type MealRow = Tables['meals']['Row'];
+
+// Define the combined booking type
+interface BookingWithDetails extends BookingRow {
+  accommodation?: AccommodationRow;
+  transportation?: TransportationRow;
+  attraction?: AttractionRow;
+  meal?: MealRow;
+}
 
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
   const { data: bookings } = useQuery<BookingWithDetails[]>({
@@ -34,7 +43,7 @@ export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
     },
   });
 
-  const { data: additionals } = useQuery<Database['public']['Tables']['trip_additionals']['Row'][]>({
+  const { data: additionals } = useQuery<Tables['trip_additionals']['Row'][]>({
     queryKey: ["trip-additionals", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
