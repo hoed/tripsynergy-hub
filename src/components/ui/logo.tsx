@@ -28,7 +28,7 @@ export function Logo({ className, size = "md" }: LogoProps) {
         size === "md" && "text-lg md:text-xl",
         size === "lg" && "text-xl md:text-2xl"
       )}>
-        TripSynergy
+        Be Your Tour
       </span>
     </div>
   );
