@@ -210,7 +210,7 @@ const Auth = () => {
           </CardContent>
           <CardFooter className="flex flex-col text-center text-sm text-gray-600 space-y-2">
             <p>By signing up, you agree to our Terms of Service and Privacy Policy</p>
-            <p>© 2025. TripSynergy. All Rights Reserved</p>
+            <p>© 2025. Hoed's Project. All Rights Reserved</p>
           </CardFooter>
         </Card>
       </div>
