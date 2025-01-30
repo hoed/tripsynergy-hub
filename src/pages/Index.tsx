@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Menu } from "lucide-react";
 import { ServicesGrid } from "@/components/ServicesGrid";
-import { TripsGrid } from "@/components/TripsGrid";
 import { ServiceManagementForm } from "@/components/ServiceManagementForm";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
@@ -19,12 +18,11 @@ const Index = () => {
   const isMobile = useIsMobile();
 
   const TabsListContent = () => (
-    <TabsList className="grid w-full max-w-3xl grid-cols-2 md:grid-cols-5">
+    <TabsList className="grid w-full max-w-3xl grid-cols-2 md:grid-cols-4">
       <TabsTrigger value="accommodations">Accommodations</TabsTrigger>
       <TabsTrigger value="transportation">Transportation</TabsTrigger>
       <TabsTrigger value="attractions">Attractions</TabsTrigger>
       <TabsTrigger value="meals">Meals</TabsTrigger>
-      <TabsTrigger value="trips">Trips</TabsTrigger>
     </TabsList>
   );
 
@@ -69,17 +67,15 @@ const Index = () => {
           ) : (
             <>
               <TabsListContent />
-              {selectedTab !== "trips" && (
-                <Button onClick={() => setShowServiceForm(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add {selectedTab.slice(0, -1)}
-                </Button>
-              )}
+              <Button onClick={() => setShowServiceForm(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add {selectedTab.slice(0, -1)}
+              </Button>
             </>
           )}
         </div>
 
-        {isMobile && selectedTab !== "trips" && (
+        {isMobile && (
           <div className="mb-4">
             <Button className="w-full" onClick={() => setShowServiceForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -100,9 +96,6 @@ const Index = () => {
           </TabsContent>
           <TabsContent value="meals">
             <ServicesGrid type="meals" />
-          </TabsContent>
-          <TabsContent value="trips">
-            <TripsGrid />
           </TabsContent>
         </div>
       </Tabs>
