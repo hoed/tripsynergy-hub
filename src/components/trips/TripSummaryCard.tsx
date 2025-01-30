@@ -1,40 +1,56 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
 
 interface TripSummaryCardProps {
   tripId: string;
 }
 
-// Define base table types
-type Tables = Database['public']['Tables'];
-type BookingRow = Tables['bookings']['Row'];
-type AccommodationRow = Tables['accommodations']['Row'];
-type TransportationRow = Tables['transportation']['Row'];
-type AttractionRow = Tables['attractions']['Row'];
-type MealRow = Tables['meals']['Row'];
+// Define simplified types for the joined data
+type SimpleBooking = {
+  id: string;
+  total_price: number;
+  accommodation?: {
+    id: string;
+    name: string;
+    price_per_night: number;
+  };
+  transportation?: {
+    id: string;
+    type: string;
+    price_per_person: number;
+  };
+  attraction?: {
+    id: string;
+    name: string;
+    price_per_person: number;
+  };
+  meal?: {
+    id: string;
+    name: string;
+    price_per_person: number;
+  };
+};
 
-// Define the combined booking type
-interface BookingWithDetails extends BookingRow {
-  accommodation?: AccommodationRow;
-  transportation?: TransportationRow;
-  attraction?: AttractionRow;
-  meal?: MealRow;
-}
+type TripAdditional = {
+  id: string;
+  name: string;
+  total_price: number;
+};
 
 export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
-  const { data: bookings } = useQuery<BookingWithDetails[]>({
+  const { data: bookings } = useQuery<SimpleBooking[]>({
     queryKey: ["trip-bookings", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
         .select(`
-          *,
-          accommodation:accommodations(*),
-          transportation:transportation(*),
-          attraction:attractions(*),
-          meal:meals(*)
+          id,
+          total_price,
+          accommodation:accommodations(id, name, price_per_night),
+          transportation:transportation(id, type, price_per_person),
+          attraction:attractions(id, name, price_per_person),
+          meal:meals(id, name, price_per_person)
         `)
         .eq("trip_id", tripId);
 
@@ -43,12 +59,12 @@ export function TripSummaryCard({ tripId }: TripSummaryCardProps) {
     },
   });
 
-  const { data: additionals } = useQuery<Tables['trip_additionals']['Row'][]>({
+  const { data: additionals } = useQuery<TripAdditional[]>({
     queryKey: ["trip-additionals", tripId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trip_additionals")
-        .select("*")
+        .select("id, name, total_price")
         .eq("trip_id", tripId);
 
       if (error) throw error;
