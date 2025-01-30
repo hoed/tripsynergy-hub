@@ -28,8 +28,9 @@ export function Logo({ className, size = "md" }: LogoProps) {
         size === "md" && "text-lg md:text-xl",
         size === "lg" && "text-xl md:text-2xl"
       )}>
-        Be Your Tour
+        Be Your Tour 
       </span>
+      <span>Travel System</span>
     </div>
   );
 }
