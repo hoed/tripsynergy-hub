@@ -7,9 +7,9 @@ interface LogoProps {
 
 export function Logo({ className, size = "md" }: LogoProps) {
   const sizeClasses = {
-    sm: "h-8 w-8",
-    md: "h-12 w-12",
-    lg: "h-16 w-16"
+    sm: "h-6 w-6 md:h-8 md:w-8",
+    md: "h-8 w-8 md:h-12 md:w-12",
+    lg: "h-12 w-12 md:h-16 md:w-16"
   };
 
   return (
@@ -24,9 +24,9 @@ export function Logo({ className, size = "md" }: LogoProps) {
       />
       <span className={cn(
         "font-semibold tracking-tight transition-colors",
-        size === "sm" && "text-lg",
-        size === "md" && "text-xl",
-        size === "lg" && "text-2xl"
+        size === "sm" && "text-base md:text-lg",
+        size === "md" && "text-lg md:text-xl",
+        size === "lg" && "text-xl md:text-2xl"
       )}>
         TripSynergy
       </span>

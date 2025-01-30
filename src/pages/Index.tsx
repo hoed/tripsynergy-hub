@@ -10,6 +10,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const { signOut } = useAuth();
@@ -29,6 +30,7 @@ const Index = () => {
 
   const HeaderContent = () => (
     <div className="flex items-center gap-4">
+      <ThemeToggle />
       <ProfileAvatar />
       <Button variant="outline" onClick={signOut}>
         Sign Out
