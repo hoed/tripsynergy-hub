@@ -42,6 +42,39 @@ export type Database = {
         }
         Relationships: []
       }
+      additional_services: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          days: number
+          description: string | null
+          id: string
+          name: string
+          price_per_person: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          days?: number
+          description?: string | null
+          id?: string
+          name: string
+          price_per_person: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          days?: number
+          description?: string | null
+          id?: string
+          name?: string
+          price_per_person?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       attractions: {
         Row: {
           created_at: string
@@ -300,6 +333,7 @@ export type Database = {
           start_date: string
           status: string | null
           title: string
+          total_additional_price: number | null
           total_price: number | null
           updated_at: string
         }
@@ -313,6 +347,7 @@ export type Database = {
           start_date: string
           status?: string | null
           title: string
+          total_additional_price?: number | null
           total_price?: number | null
           updated_at?: string
         }
@@ -326,6 +361,7 @@ export type Database = {
           start_date?: string
           status?: string | null
           title?: string
+          total_additional_price?: number | null
           total_price?: number | null
           updated_at?: string
         }

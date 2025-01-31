@@ -108,13 +108,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center justify-center">
-          <Logo size="lg" className="mb-8" />
+          <Logo size="lg" className="w-auto h-16 md:h-20 mb-8" />
         </div>
         
-        <Card>
+        <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-center">Welcome</CardTitle>
             <CardDescription className="text-center">
@@ -141,7 +141,7 @@ const Auth = () => {
             
             <div className="relative mb-4">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t dark:border-gray-700" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
@@ -208,7 +208,7 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
           </CardContent>
-          <CardFooter className="flex flex-col text-center text-sm text-gray-600 space-y-2">
+          <CardFooter className="flex flex-col text-center text-sm text-gray-600 dark:text-gray-400 space-y-2">
             <p>By signing up, you agree to our Terms of Service and Privacy Policy</p>
             <p>© 2025. Hoed's Project. All Rights Reserved</p>
           </CardFooter>
