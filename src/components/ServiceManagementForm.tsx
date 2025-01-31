@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [isStaff, setIsStaff] = useState(false);
 
   const form = useForm<ServiceFormData>({
     defaultValues: {
@@ -42,6 +43,22 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
       days: 1,
     },
   });
+
+  useEffect(() => {
+    const checkStaffStatus = async () => {
+      if (!user?.id) return;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      setIsStaff(profile?.role === 'owner' || profile?.role === 'operator');
+    };
+
+    checkStaffStatus();
+  }, [user]);
 
   const calculateTotal = (data: ServiceFormData) => {
     let total = 0;
@@ -62,6 +79,15 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
         variant: "destructive",
         title: "Error",
         description: "You must be logged in to create services",
+      });
+      return;
+    }
+
+    if (!isStaff) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be a staff member to create services",
       });
       return;
     }
@@ -122,6 +148,8 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
       setIsSubmitting(false);
     }
   };
+
+  // ... keep existing code (form JSX)
 
   return (
     <Form {...form}>
@@ -301,7 +329,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
           Total Price: ${totalPrice.toFixed(2)}
         </div>
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting || !isStaff}>
           {isSubmitting ? "Creating..." : "Create Service"}
         </Button>
       </form>
