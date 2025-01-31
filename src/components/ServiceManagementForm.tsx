@@ -25,7 +25,7 @@ interface ServiceManagementFormProps {
 }
 
 export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagementFormProps) {
-  const { session } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -57,7 +57,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
   };
 
   const onSubmit = async (data: ServiceFormData) => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -78,25 +78,26 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
           description: data.description,
           location: data.location,
           price_per_night: data.price,
-          created_by: session.user.id,
+          created_by: user.id,
         };
       } else if (serviceType === "transportation") {
         serviceData = {
           type: data.type,
           description: data.description,
           price_per_person: data.price,
-          created_by: session.user.id,
+          created_by: user.id,
         };
       } else {
         serviceData = {
           name: data.name,
           description: data.description,
           price_per_person: data.price,
-          created_by: session.user.id,
+          created_by: user.id,
           ...(serviceType === "attractions" ? { location: data.location } : {}),
         };
       }
 
+      console.log("Inserting service data:", serviceData);
       const { error } = await supabase
         .from(serviceType)
         .insert([serviceData]);
@@ -111,6 +112,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
       form.reset();
       onSuccess();
     } catch (error: any) {
+      console.error("Error creating service:", error);
       toast({
         variant: "destructive",
         title: "Error",
