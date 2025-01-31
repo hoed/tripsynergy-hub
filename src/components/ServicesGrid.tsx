@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ServiceCard } from "./ServiceCard";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
+import { useAuth } from "@/components/AuthProvider";
 
 type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
 
@@ -18,17 +19,26 @@ interface ServicesGridProps {
 
 export function ServicesGrid({ type }: ServicesGridProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const { data: services, isLoading, error } = useQuery({
     queryKey: [type],
     queryFn: async () => {
+      if (!user) {
+        throw new Error("User must be authenticated");
+      }
+
       const { data, error } = await supabase
         .from(type)
         .select("*");
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching services:", error);
+        throw error;
+      }
       return data as Service[];
     },
+    enabled: !!user, // Only run query if user is authenticated
   });
 
   if (error) {
@@ -37,6 +47,7 @@ export function ServicesGrid({ type }: ServicesGridProps) {
       title: "Error",
       description: "Failed to load services. Please try again later.",
     });
+    console.error("Query error:", error);
   }
 
   if (isLoading) {
