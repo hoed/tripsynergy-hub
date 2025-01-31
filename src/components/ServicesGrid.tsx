@@ -30,8 +30,7 @@ export function ServicesGrid({ type }: ServicesGridProps) {
 
       const { data, error } = await supabase
         .from(type)
-        .select("*")
-        .eq('created_by', user.id);
+        .select("*");
       
       if (error) {
         console.error("Error fetching services:", error);
