@@ -8,6 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Icons } from "@/components/ui/icons";
 import { Logo } from "@/components/ui/logo";
+import { OTPInput } from "@/components/OTPInput";
+
+const RATE_LIMIT_MINUTES = 15;
+const MAX_ATTEMPTS = 3;
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,6 +21,54 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [lastAttemptTime, setLastAttemptTime] = useState<Date | null>(null);
+
+  const checkRateLimit = () => {
+    if (!lastAttemptTime) return true;
+    
+    const timeSinceLastAttempt = (new Date().getTime() - lastAttemptTime.getTime()) / 1000 / 60;
+    return timeSinceLastAttempt >= RATE_LIMIT_MINUTES;
+  };
+
+  const handleOTPComplete = async (otp: string) => {
+    if (attempts >= MAX_ATTEMPTS && !checkRateLimit()) {
+      toast({
+        variant: "destructive",
+        title: "Too many attempts",
+        description: `Please try again after ${RATE_LIMIT_MINUTES} minutes`,
+      });
+      return;
+    }
+
+    setAttempts((prev) => prev + 1);
+    setLastAttemptTime(new Date());
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'signup'
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Your email has been verified.",
+      });
+      
+      navigate("/");
+    } catch (error: any) {
+      console.error("OTP verification error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,95 +170,105 @@ const Auth = () => {
           <CardHeader>
             <CardTitle className="text-center">Welcome</CardTitle>
             <CardDescription className="text-center">
-              Sign in to your account or create a new one
+              {showOTP ? "Enter verification code" : "Sign in to your account or create a new one"}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-4">
-              <Button 
-                variant="outline" 
-                type="button" 
-                className="w-full" 
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-              >
-                {googleLoading ? (
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.google className="mr-2 h-4 w-4" />
-                )}
-                Continue with Google
-              </Button>
-            </div>
-            
-            <div className="relative mb-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t dark:border-gray-700" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
+            {showOTP ? (
+              <OTPInput
+                length={6}
+                onComplete={handleOTPComplete}
+                expiryMinutes={10}
+              />
+            ) : (
+              <>
+                <div className="mb-4">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="w-full" 
+                    onClick={handleGoogleSignIn}
+                    disabled={googleLoading}
+                  >
+                    {googleLoading ? (
+                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Icons.google className="mr-2 h-4 w-4" />
+                    )}
+                    Continue with Google
+                  </Button>
+                </div>
+                
+                <div className="relative mb-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t dark:border-gray-700" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
 
-            <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign In"}
-                  </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <Input
-                    type="text"
-                    placeholder="Full Name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Signing up..." : "Sign Up"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+                <Tabs defaultValue="signin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="signin">Sign In</TabsTrigger>
+                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="signin">
+                    <form onSubmit={handleSignIn} className="space-y-4">
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? "Signing in..." : "Sign In"}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="signup">
+                    <form onSubmit={handleSignUp} className="space-y-4">
+                      <Input
+                        type="text"
+                        placeholder="Full Name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? "Signing up..." : "Sign Up"}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+              </>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col text-center text-sm text-gray-600 dark:text-gray-400 space-y-2">
             <p>By signing up, you agree to our Terms of Service and Privacy Policy</p>
