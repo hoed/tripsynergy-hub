@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Plus, Menu } from "lucide-react";
+import { Plus, Menu, Hotel, Bus, MapPin, Utensils } from "lucide-react";
 import { ServicesGrid } from "@/components/ServicesGrid";
 import { ServiceManagementForm } from "@/components/ServiceManagementForm";
 import { useAuth } from "@/components/AuthProvider";
@@ -11,12 +11,41 @@ import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BookingSummary } from "@/components/BookingSummary";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { signOut } = useAuth();
   const [selectedTab, setSelectedTab] = useState("accommodations");
   const [showServiceForm, setShowServiceForm] = useState(false);
   const isMobile = useIsMobile();
+
+  const { data: summaryData } = useQuery({
+    queryKey: ['services-summary'],
+    queryFn: async () => {
+      const [accommodations, transportation, attractions, meals] = await Promise.all([
+        supabase.from('accommodations').select('*'),
+        supabase.from('transportation').select('*'),
+        supabase.from('attractions').select('*'),
+        supabase.from('meals').select('*'),
+      ]);
+
+      return {
+        accommodations: accommodations.data?.length || 0,
+        transportation: transportation.data?.length || 0,
+        attractions: attractions.data?.length || 0,
+        meals: meals.data?.length || 0,
+      };
+    },
+  });
+
+  const summaryCards = [
+    { title: 'Accommodations', count: summaryData?.accommodations || 0, icon: Hotel },
+    { title: 'Transportation', count: summaryData?.transportation || 0, icon: Bus },
+    { title: 'Attractions', count: summaryData?.attractions || 0, icon: MapPin },
+    { title: 'Meals', count: summaryData?.meals || 0, icon: Utensils },
+  ];
 
   const TabsListContent = () => (
     <TabsList className="grid w-full max-w-3xl grid-cols-2 md:grid-cols-4">
@@ -60,10 +89,26 @@ const Index = () => {
       </div>
 
       {isMobile && (
-        <div className="mb-8">
-          <BookingSummary />
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          {summaryCards.map((card) => (
+            <Card key={card.title} className="col-span-1">
+              <CardHeader className="p-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <card.icon className="h-4 w-4" />
+                  {card.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <p className="text-2xl font-bold">{card.count}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
+
+      <div className="mb-8">
+        <BookingSummary />
+      </div>
       
       <Tabs defaultValue="accommodations" className="w-full" onValueChange={setSelectedTab}>
         <div className="flex justify-between items-center mb-4 overflow-x-auto">
