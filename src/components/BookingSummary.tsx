@@ -19,7 +19,7 @@ export function BookingSummary() {
       if (!user) return;
 
       // Fetch user's bookings
-      const { data: bookings } = await supabase
+      const { data: bookings, error } = await supabase
         .from('bookings')
         .select(`
           *,
@@ -29,20 +29,30 @@ export function BookingSummary() {
           meals (name, price_per_person)
         `)
         .eq('client_id', user.id)
-        .eq('status', 'pending')
-        .single();
+        .eq('status', 'pending');
 
-      if (!bookings) return;
+      if (error) {
+        console.error('Error fetching bookings:', error);
+        return;
+      }
 
+      if (!bookings || bookings.length === 0) {
+        setSummaryItems([]);
+        setTotalPrice(0);
+        return;
+      }
+
+      // Process the first pending booking
+      const booking = bookings[0];
       const items: SummaryItem[] = [];
       let total = 0;
 
       // Process accommodation
-      if (bookings.accommodations) {
-        const days = Math.ceil((new Date(bookings.end_date).getTime() - new Date(bookings.start_date).getTime()) / (1000 * 60 * 60 * 24));
-        const accommodationTotal = bookings.accommodations.price_per_night * days;
+      if (booking.accommodations) {
+        const days = Math.ceil((new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / (1000 * 60 * 60 * 24));
+        const accommodationTotal = booking.accommodations.price_per_night * days;
         items.push({
-          name: bookings.accommodations.name,
+          name: booking.accommodations.name,
           price: accommodationTotal,
           type: 'Accommodation'
         });
@@ -50,10 +60,10 @@ export function BookingSummary() {
       }
 
       // Process transportation
-      if (bookings.transportation) {
-        const transportationTotal = bookings.transportation.price_per_person * bookings.number_of_people;
+      if (booking.transportation) {
+        const transportationTotal = booking.transportation.price_per_person * booking.number_of_people;
         items.push({
-          name: bookings.transportation.type,
+          name: booking.transportation.type,
           price: transportationTotal,
           type: 'Transportation'
         });
@@ -61,10 +71,10 @@ export function BookingSummary() {
       }
 
       // Process attraction
-      if (bookings.attractions) {
-        const attractionTotal = bookings.attractions.price_per_person * bookings.number_of_people;
+      if (booking.attractions) {
+        const attractionTotal = booking.attractions.price_per_person * booking.number_of_people;
         items.push({
-          name: bookings.attractions.name,
+          name: booking.attractions.name,
           price: attractionTotal,
           type: 'Attraction'
         });
@@ -72,10 +82,10 @@ export function BookingSummary() {
       }
 
       // Process meal
-      if (bookings.meals) {
-        const mealTotal = bookings.meals.price_per_person * bookings.number_of_people;
+      if (booking.meals) {
+        const mealTotal = booking.meals.price_per_person * booking.number_of_people;
         items.push({
-          name: bookings.meals.name,
+          name: booking.meals.name,
           price: mealTotal,
           type: 'Meal'
         });
