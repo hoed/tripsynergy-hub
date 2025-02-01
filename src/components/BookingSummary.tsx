@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
+import { calculateAccommodationPrice, calculatePerPersonPrice } from "@/utils/bookingCalculations";
+import { SummaryItem } from "./SummaryItem";
 
 interface SummaryItem {
   name: string;
@@ -18,7 +20,6 @@ export function BookingSummary() {
     const fetchBookingsAndCalculate = async () => {
       if (!user) return;
 
-      // Fetch user's bookings
       const { data: bookings, error } = await supabase
         .from('bookings')
         .select(`
@@ -42,54 +43,52 @@ export function BookingSummary() {
         return;
       }
 
-      // Process the first pending booking
       const booking = bookings[0];
       const items: SummaryItem[] = [];
       let total = 0;
 
-      // Process accommodation
-      if (booking.accommodations) {
-        const days = Math.ceil((new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / (1000 * 60 * 60 * 24));
-        const accommodationTotal = booking.accommodations.price_per_night * days;
-        items.push({
-          name: booking.accommodations.name,
-          price: accommodationTotal,
-          type: 'Accommodation'
-        });
-        total += accommodationTotal;
+      // Calculate accommodation price
+      const accommodationPrice = calculateAccommodationPrice(
+        booking.accommodations,
+        booking.start_date,
+        booking.end_date
+      );
+      if (accommodationPrice) {
+        items.push(accommodationPrice);
+        total += accommodationPrice.price;
       }
 
-      // Process transportation
-      if (booking.transportation) {
-        const transportationTotal = booking.transportation.price_per_person * booking.number_of_people;
-        items.push({
-          name: booking.transportation.type,
-          price: transportationTotal,
-          type: 'Transportation'
-        });
-        total += transportationTotal;
+      // Calculate transportation price
+      const transportationPrice = calculatePerPersonPrice(
+        booking.transportation,
+        booking.number_of_people,
+        'Transportation'
+      );
+      if (transportationPrice) {
+        items.push(transportationPrice);
+        total += transportationPrice.price;
       }
 
-      // Process attraction
-      if (booking.attractions) {
-        const attractionTotal = booking.attractions.price_per_person * booking.number_of_people;
-        items.push({
-          name: booking.attractions.name,
-          price: attractionTotal,
-          type: 'Attraction'
-        });
-        total += attractionTotal;
+      // Calculate attraction price
+      const attractionPrice = calculatePerPersonPrice(
+        booking.attractions,
+        booking.number_of_people,
+        'Attraction'
+      );
+      if (attractionPrice) {
+        items.push(attractionPrice);
+        total += attractionPrice.price;
       }
 
-      // Process meal
-      if (booking.meals) {
-        const mealTotal = booking.meals.price_per_person * booking.number_of_people;
-        items.push({
-          name: booking.meals.name,
-          price: mealTotal,
-          type: 'Meal'
-        });
-        total += mealTotal;
+      // Calculate meal price
+      const mealPrice = calculatePerPersonPrice(
+        booking.meals,
+        booking.number_of_people,
+        'Meal'
+      );
+      if (mealPrice) {
+        items.push(mealPrice);
+        total += mealPrice.price;
       }
 
       setSummaryItems(items);
@@ -120,13 +119,7 @@ export function BookingSummary() {
       <CardContent>
         <div className="space-y-4">
           {summaryItems.map((item, index) => (
-            <div key={index} className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{item.name}</p>
-                <p className="text-sm text-muted-foreground">{item.type}</p>
-              </div>
-              <p className="font-medium">${item.price.toFixed(2)}</p>
-            </div>
+            <SummaryItem key={index} {...item} />
           ))}
           <div className="pt-4 border-t">
             <div className="flex justify-between items-center">
