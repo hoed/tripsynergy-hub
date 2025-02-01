@@ -2,14 +2,15 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Plus, Menu } from "lucide-react";
 import { ServicesGrid } from "@/components/ServicesGrid";
 import { ServiceManagementForm } from "@/components/ServiceManagementForm";
 import { useAuth } from "@/components/AuthProvider";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BookingSummary } from "@/components/BookingSummary";
 
 const Index = () => {
   const { signOut } = useAuth();
@@ -57,6 +58,12 @@ const Index = () => {
           <HeaderContent />
         )}
       </div>
+
+      {isMobile && (
+        <div className="mb-8">
+          <BookingSummary />
+        </div>
+      )}
       
       <Tabs defaultValue="accommodations" className="w-full" onValueChange={setSelectedTab}>
         <div className="flex justify-between items-center mb-4 overflow-x-auto">
