@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/AuthProvider";
 
 interface SummaryItem {
   name: string;
@@ -11,87 +12,95 @@ interface SummaryItem {
 export function BookingSummary() {
   const [summaryItems, setSummaryItems] = useState<SummaryItem[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchSummaryData = async () => {
-      // Fetch data from all relevant tables
-      const [accommodations, transportation, attractions, meals, additionals] = await Promise.all([
-        supabase.from('accommodations').select('name, price_per_night'),
-        supabase.from('transportation').select('type, price_per_person'),
-        supabase.from('attractions').select('name, price_per_person'),
-        supabase.from('meals').select('name, price_per_person'),
-        supabase.from('additional_services').select('name, price_per_person'),
-      ]);
+    const fetchBookingsAndCalculate = async () => {
+      if (!user) return;
+
+      // Fetch user's bookings
+      const { data: bookings } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          accommodations (name, price_per_night),
+          transportation (type, price_per_person),
+          attractions (name, price_per_person),
+          meals (name, price_per_person)
+        `)
+        .eq('client_id', user.id)
+        .eq('status', 'pending')
+        .single();
+
+      if (!bookings) return;
 
       const items: SummaryItem[] = [];
       let total = 0;
 
-      // Process accommodations
-      if (accommodations.data) {
-        accommodations.data.forEach(item => {
-          items.push({
-            name: item.name,
-            price: item.price_per_night,
-            type: 'Accommodation'
-          });
-          total += item.price_per_night;
+      // Process accommodation
+      if (bookings.accommodations) {
+        const days = Math.ceil((new Date(bookings.end_date).getTime() - new Date(bookings.start_date).getTime()) / (1000 * 60 * 60 * 24));
+        const accommodationTotal = bookings.accommodations.price_per_night * days;
+        items.push({
+          name: bookings.accommodations.name,
+          price: accommodationTotal,
+          type: 'Accommodation'
         });
+        total += accommodationTotal;
       }
 
       // Process transportation
-      if (transportation.data) {
-        transportation.data.forEach(item => {
-          items.push({
-            name: item.type,
-            price: item.price_per_person,
-            type: 'Transportation'
-          });
-          total += item.price_per_person;
+      if (bookings.transportation) {
+        const transportationTotal = bookings.transportation.price_per_person * bookings.number_of_people;
+        items.push({
+          name: bookings.transportation.type,
+          price: transportationTotal,
+          type: 'Transportation'
         });
+        total += transportationTotal;
       }
 
-      // Process attractions
-      if (attractions.data) {
-        attractions.data.forEach(item => {
-          items.push({
-            name: item.name,
-            price: item.price_per_person,
-            type: 'Attraction'
-          });
-          total += item.price_per_person;
+      // Process attraction
+      if (bookings.attractions) {
+        const attractionTotal = bookings.attractions.price_per_person * bookings.number_of_people;
+        items.push({
+          name: bookings.attractions.name,
+          price: attractionTotal,
+          type: 'Attraction'
         });
+        total += attractionTotal;
       }
 
-      // Process meals
-      if (meals.data) {
-        meals.data.forEach(item => {
-          items.push({
-            name: item.name,
-            price: item.price_per_person,
-            type: 'Meal'
-          });
-          total += item.price_per_person;
+      // Process meal
+      if (bookings.meals) {
+        const mealTotal = bookings.meals.price_per_person * bookings.number_of_people;
+        items.push({
+          name: bookings.meals.name,
+          price: mealTotal,
+          type: 'Meal'
         });
-      }
-
-      // Process additional services
-      if (additionals.data) {
-        additionals.data.forEach(item => {
-          items.push({
-            name: item.name,
-            price: item.price_per_person,
-            type: 'Additional'
-          });
-          total += item.price_per_person;
-        });
+        total += mealTotal;
       }
 
       setSummaryItems(items);
       setTotalPrice(total);
     };
 
-    fetchSummaryData();
-  }, []);
+    fetchBookingsAndCalculate();
+  }, [user]);
+
+  if (summaryItems.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Booking Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">No active bookings found.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
