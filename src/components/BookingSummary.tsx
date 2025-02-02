@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { calculateAccommodationPrice, calculatePerPersonPrice } from "@/utils/bookingCalculations";
-import { SummaryItem } from "./SummaryItem";
 import { useToast } from "@/hooks/use-toast";
+import { BookingList } from "./booking/BookingList";
 
 interface SummaryItem {
   name: string;
@@ -64,64 +62,68 @@ export function BookingSummary() {
       let total = 0;
 
       bookings.forEach(booking => {
-        // Calculate accommodation price
-        const accommodationPrice = calculateAccommodationPrice(
-          booking.accommodations,
-          booking.start_date,
-          booking.end_date
-        );
-        if (accommodationPrice) {
-          items.push({
-            ...accommodationPrice,
-            bookingId: booking.id,
-            profitPercentage: booking.profit_percentage
-          });
-          total += accommodationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+        if (booking.accommodations) {
+          const accommodationPrice = calculateAccommodationPrice(
+            booking.accommodations,
+            booking.start_date,
+            booking.end_date
+          );
+          if (accommodationPrice) {
+            items.push({
+              ...accommodationPrice,
+              bookingId: booking.id,
+              profitPercentage: booking.profit_percentage
+            });
+            total += accommodationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+          }
         }
 
-        // Calculate transportation price
-        const transportationPrice = calculatePerPersonPrice(
-          booking.transportation,
-          booking.number_of_people,
-          'Transportation'
-        );
-        if (transportationPrice) {
-          items.push({
-            ...transportationPrice,
-            bookingId: booking.id,
-            profitPercentage: booking.profit_percentage
-          });
-          total += transportationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+        if (booking.transportation) {
+          const transportationPrice = calculatePerPersonPrice(
+            booking.transportation,
+            booking.number_of_people,
+            'Transportation'
+          );
+          if (transportationPrice) {
+            items.push({
+              ...transportationPrice,
+              bookingId: booking.id,
+              profitPercentage: booking.profit_percentage
+            });
+            total += transportationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+          }
         }
 
-        // Calculate attraction price
-        const attractionPrice = calculatePerPersonPrice(
-          booking.attractions,
-          booking.number_of_people,
-          'Attraction'
-        );
-        if (attractionPrice) {
-          items.push({
-            ...attractionPrice,
-            bookingId: booking.id,
-            profitPercentage: booking.profit_percentage
-          });
-          total += attractionPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+        if (booking.attractions) {
+          const attractionPrice = calculatePerPersonPrice(
+            booking.attractions,
+            booking.number_of_people,
+            'Attraction'
+          );
+          if (attractionPrice) {
+            items.push({
+              ...attractionPrice,
+              bookingId: booking.id,
+              profitPercentage: booking.profit_percentage
+            });
+            total += attractionPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+          }
         }
 
-        // Calculate meal price
-        const mealPrice = calculatePerPersonPrice(
-          booking.meals,
-          booking.number_of_people,
-          'Meal'
-        );
-        if (mealPrice) {
-          items.push({
-            ...mealPrice,
-            bookingId: booking.id,
-            profitPercentage: booking.profit_percentage
-          });
-          total += mealPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+        if (booking.meals) {
+          const mealPrice = calculatePerPersonPrice(
+            booking.meals,
+            booking.number_of_people,
+            'Meal'
+          );
+          if (mealPrice) {
+            items.push({
+              ...mealPrice,
+              bookingId: booking.id,
+              profitPercentage: booking.profit_percentage
+            });
+            total += mealPrice.price * (1 + (booking.profit_percentage || 0) / 100);
+          }
         }
       });
 
@@ -171,35 +173,15 @@ export function BookingSummary() {
         <CardTitle>Booking Summary</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {summaryItems.map((item, index) => (
-            <div key={index} className="flex justify-between items-center gap-4">
-              <SummaryItem {...item} />
-              {isStaff && item.bookingId && (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    defaultValue={item.profitPercentage || 0}
-                    className="w-24"
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      if (!isNaN(value)) {
-                        handleProfitUpdate(item.bookingId!, value);
-                      }
-                    }}
-                  />
-                  <span className="text-sm text-muted-foreground">%</span>
-                </div>
-              )}
-            </div>
-          ))}
-          <div className="pt-4 border-t">
-            <div className="flex justify-between items-center">
-              <p className="font-semibold">Total</p>
-              <p className="font-semibold">${totalPrice.toFixed(2)}</p>
-            </div>
+        <BookingList
+          items={summaryItems}
+          isStaff={isStaff}
+          onProfitUpdate={handleProfitUpdate}
+        />
+        <div className="pt-4 border-t">
+          <div className="flex justify-between items-center">
+            <p className="font-semibold">Total</p>
+            <p className="font-semibold">${totalPrice.toFixed(2)}</p>
           </div>
         </div>
       </CardContent>
