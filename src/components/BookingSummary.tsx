@@ -24,10 +24,13 @@ export function BookingSummary() {
   useEffect(() => {
     const checkStaffStatus = async () => {
       if (!user) return;
-      const { data, error } = await supabase.rpc('is_staff', { user_id: user.id });
-      if (!error) {
-        setIsStaff(data);
-      }
+      const { data: role } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      setIsStaff(role?.role === 'owner' || role?.role === 'operator');
     };
     checkStaffStatus();
   }, [user]);
