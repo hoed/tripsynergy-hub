@@ -29,8 +29,7 @@ export function BookingSummary() {
           attractions (name, price_per_person),
           meals (name, price_per_person)
         `)
-        .eq('client_id', user.id)
-        .eq('status', 'pending');
+        .eq('client_id', user.id);
 
       if (error) {
         console.error('Error fetching bookings:', error);
@@ -43,53 +42,54 @@ export function BookingSummary() {
         return;
       }
 
-      const booking = bookings[0];
       const items: SummaryItem[] = [];
       let total = 0;
 
-      // Calculate accommodation price
-      const accommodationPrice = calculateAccommodationPrice(
-        booking.accommodations,
-        booking.start_date,
-        booking.end_date
-      );
-      if (accommodationPrice) {
-        items.push(accommodationPrice);
-        total += accommodationPrice.price;
-      }
+      bookings.forEach(booking => {
+        // Calculate accommodation price
+        const accommodationPrice = calculateAccommodationPrice(
+          booking.accommodations,
+          booking.start_date,
+          booking.end_date
+        );
+        if (accommodationPrice) {
+          items.push(accommodationPrice);
+          total += accommodationPrice.price;
+        }
 
-      // Calculate transportation price
-      const transportationPrice = calculatePerPersonPrice(
-        booking.transportation,
-        booking.number_of_people,
-        'Transportation'
-      );
-      if (transportationPrice) {
-        items.push(transportationPrice);
-        total += transportationPrice.price;
-      }
+        // Calculate transportation price
+        const transportationPrice = calculatePerPersonPrice(
+          booking.transportation,
+          booking.number_of_people,
+          'Transportation'
+        );
+        if (transportationPrice) {
+          items.push(transportationPrice);
+          total += transportationPrice.price;
+        }
 
-      // Calculate attraction price
-      const attractionPrice = calculatePerPersonPrice(
-        booking.attractions,
-        booking.number_of_people,
-        'Attraction'
-      );
-      if (attractionPrice) {
-        items.push(attractionPrice);
-        total += attractionPrice.price;
-      }
+        // Calculate attraction price
+        const attractionPrice = calculatePerPersonPrice(
+          booking.attractions,
+          booking.number_of_people,
+          'Attraction'
+        );
+        if (attractionPrice) {
+          items.push(attractionPrice);
+          total += attractionPrice.price;
+        }
 
-      // Calculate meal price
-      const mealPrice = calculatePerPersonPrice(
-        booking.meals,
-        booking.number_of_people,
-        'Meal'
-      );
-      if (mealPrice) {
-        items.push(mealPrice);
-        total += mealPrice.price;
-      }
+        // Calculate meal price
+        const mealPrice = calculatePerPersonPrice(
+          booking.meals,
+          booking.number_of_people,
+          'Meal'
+        );
+        if (mealPrice) {
+          items.push(mealPrice);
+          total += mealPrice.price;
+        }
+      });
 
       setSummaryItems(items);
       setTotalPrice(total);
