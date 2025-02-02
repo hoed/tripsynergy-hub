@@ -118,6 +118,7 @@ export type Database = {
           id: string
           meal_id: string | null
           number_of_people: number
+          profit_percentage: number | null
           start_date: string
           status: string
           total_price: number
@@ -133,6 +134,7 @@ export type Database = {
           id?: string
           meal_id?: string | null
           number_of_people: number
+          profit_percentage?: number | null
           start_date: string
           status?: string
           total_price: number
@@ -148,6 +150,7 @@ export type Database = {
           id?: string
           meal_id?: string | null
           number_of_people?: number
+          profit_percentage?: number | null
           start_date?: string
           status?: string
           total_price?: number

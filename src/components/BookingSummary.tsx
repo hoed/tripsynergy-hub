@@ -1,20 +1,38 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
 import { calculateAccommodationPrice, calculatePerPersonPrice } from "@/utils/bookingCalculations";
 import { SummaryItem } from "./SummaryItem";
+import { useToast } from "@/hooks/use-toast";
 
 interface SummaryItem {
   name: string;
   price: number;
   type: string;
+  bookingId?: string;
+  profitPercentage?: number;
 }
 
 export function BookingSummary() {
   const [summaryItems, setSummaryItems] = useState<SummaryItem[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [isStaff, setIsStaff] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkStaffStatus = async () => {
+      if (!user) return;
+      const { data, error } = await supabase.rpc('is_staff', { user_id: user.id });
+      if (!error) {
+        setIsStaff(data);
+      }
+    };
+    checkStaffStatus();
+  }, [user]);
 
   useEffect(() => {
     const fetchBookingsAndCalculate = async () => {
@@ -53,8 +71,12 @@ export function BookingSummary() {
           booking.end_date
         );
         if (accommodationPrice) {
-          items.push(accommodationPrice);
-          total += accommodationPrice.price;
+          items.push({
+            ...accommodationPrice,
+            bookingId: booking.id,
+            profitPercentage: booking.profit_percentage
+          });
+          total += accommodationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
         }
 
         // Calculate transportation price
@@ -64,8 +86,12 @@ export function BookingSummary() {
           'Transportation'
         );
         if (transportationPrice) {
-          items.push(transportationPrice);
-          total += transportationPrice.price;
+          items.push({
+            ...transportationPrice,
+            bookingId: booking.id,
+            profitPercentage: booking.profit_percentage
+          });
+          total += transportationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
         }
 
         // Calculate attraction price
@@ -75,8 +101,12 @@ export function BookingSummary() {
           'Attraction'
         );
         if (attractionPrice) {
-          items.push(attractionPrice);
-          total += attractionPrice.price;
+          items.push({
+            ...attractionPrice,
+            bookingId: booking.id,
+            profitPercentage: booking.profit_percentage
+          });
+          total += attractionPrice.price * (1 + (booking.profit_percentage || 0) / 100);
         }
 
         // Calculate meal price
@@ -86,8 +116,12 @@ export function BookingSummary() {
           'Meal'
         );
         if (mealPrice) {
-          items.push(mealPrice);
-          total += mealPrice.price;
+          items.push({
+            ...mealPrice,
+            bookingId: booking.id,
+            profitPercentage: booking.profit_percentage
+          });
+          total += mealPrice.price * (1 + (booking.profit_percentage || 0) / 100);
         }
       });
 
@@ -97,6 +131,26 @@ export function BookingSummary() {
 
     fetchBookingsAndCalculate();
   }, [user]);
+
+  const handleProfitUpdate = async (bookingId: string, newProfit: number) => {
+    const { error } = await supabase
+      .from('bookings')
+      .update({ profit_percentage: newProfit })
+      .eq('id', bookingId);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profit percentage",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Profit percentage updated successfully",
+      });
+    }
+  };
 
   if (summaryItems.length === 0) {
     return (
@@ -119,7 +173,27 @@ export function BookingSummary() {
       <CardContent>
         <div className="space-y-4">
           {summaryItems.map((item, index) => (
-            <SummaryItem key={index} {...item} />
+            <div key={index} className="flex justify-between items-center gap-4">
+              <SummaryItem {...item} />
+              {isStaff && item.bookingId && (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    defaultValue={item.profitPercentage || 0}
+                    className="w-24"
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value)) {
+                        handleProfitUpdate(item.bookingId!, value);
+                      }
+                    }}
+                  />
+                  <span className="text-sm text-muted-foreground">%</span>
+                </div>
+              )}
+            </div>
           ))}
           <div className="pt-4 border-t">
             <div className="flex justify-between items-center">

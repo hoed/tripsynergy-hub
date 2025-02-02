@@ -38,7 +38,7 @@ export function ServicesGrid({ type }: ServicesGridProps) {
       }
       return data as Service[];
     },
-    enabled: !!user, // Only run query if user is authenticated
+    enabled: !!user,
   });
 
   if (error) {
