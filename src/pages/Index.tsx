@@ -14,6 +14,14 @@ import { BookingSummary } from "@/components/BookingSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const Index = () => {
   const { signOut } = useAuth();
@@ -47,6 +55,13 @@ const Index = () => {
     { title: 'Meals', count: summaryData?.meals || 0, icon: Utensils },
   ];
 
+  const serviceTypes = [
+    { value: "accommodations", label: "Accommodations", icon: Hotel },
+    { value: "transportation", label: "Transportation", icon: Bus },
+    { value: "attractions", label: "Attractions", icon: MapPin },
+    { value: "meals", label: "Meals", icon: Utensils },
+  ];
+
   const TabsListContent = () => (
     <TabsList className="grid w-full max-w-3xl grid-cols-2 md:grid-cols-4">
       <TabsTrigger value="accommodations">Accommodations</TabsTrigger>
@@ -64,6 +79,37 @@ const Index = () => {
         Sign Out
       </Button>
     </div>
+  );
+
+  const MobileNavigation = () => (
+    <Breadcrumb>
+      <BreadcrumbList className="flex-wrap">
+        {serviceTypes.map((service, index) => (
+          <div key={service.value} className="flex items-center">
+            {index > 0 && <BreadcrumbSeparator />}
+            <BreadcrumbItem>
+              {selectedTab === service.value ? (
+                <BreadcrumbPage className="flex items-center gap-1">
+                  <service.icon className="h-4 w-4" />
+                  {service.label}
+                </BreadcrumbPage>
+              ) : (
+                <BreadcrumbLink 
+                  asChild 
+                  className="flex items-center gap-1"
+                  onClick={() => setSelectedTab(service.value)}
+                >
+                  <button>
+                    <service.icon className="h-4 w-4" />
+                    {service.label}
+                  </button>
+                </BreadcrumbLink>
+              )}
+            </BreadcrumbItem>
+          </div>
+        ))}
+      </BreadcrumbList>
+    </Breadcrumb>
   );
 
   return (
@@ -114,7 +160,7 @@ const Index = () => {
         <div className="flex justify-between items-center mb-4 overflow-x-auto">
           {isMobile ? (
             <div className="w-full">
-              <TabsListContent />
+              <MobileNavigation />
             </div>
           ) : (
             <>
