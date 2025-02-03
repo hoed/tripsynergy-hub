@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
@@ -98,14 +99,20 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
           mode="range"
           selected={dateRange}
           onSelect={setDateRange}
-          numberOfMonths={2}
+          numberOfMonths={1}
           disabled={(date) => date < new Date()}
           className="rounded-md border"
         />
+        {dateRange?.from && (
+          <p className="text-sm text-muted-foreground">
+            Selected: {format(dateRange.from, 'MMM dd, yyyy')} 
+            {dateRange.to && ` - ${format(dateRange.to, 'MMM dd, yyyy')}`}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Number of People</label>
+        <label className="text-sm font-medium">Number of {serviceType === 'transportation' ? 'Items' : 'People'}</label>
         <Input
           type="number"
           min={1}

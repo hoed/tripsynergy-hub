@@ -4,6 +4,7 @@ import { ServiceCard } from "./ServiceCard";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/components/AuthProvider";
+import { useEffect } from "react";
 
 type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
 
@@ -21,7 +22,7 @@ export function ServicesGrid({ type }: ServicesGridProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   
-  const { data: services, isLoading, error } = useQuery({
+  const { data: services, isLoading, error, refetch } = useQuery({
     queryKey: [type],
     queryFn: async () => {
       if (!user) {
@@ -40,6 +41,28 @@ export function ServicesGrid({ type }: ServicesGridProps) {
     },
     enabled: !!user,
   });
+
+  useEffect(() => {
+    // Set up real-time subscription for services
+    const channel = supabase
+      .channel('services-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: type
+        },
+        () => {
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [type, refetch]);
 
   if (error) {
     toast({
@@ -81,6 +104,8 @@ export function ServicesGrid({ type }: ServicesGridProps) {
     switch (serviceType) {
       case "accommodations":
         return "per night";
+      case "transportation":
+        return "per item";
       default:
         return "per person";
     }
