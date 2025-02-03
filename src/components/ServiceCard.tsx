@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { MapPin } from "lucide-react";
 import { BookingForm } from "./BookingForm";
 import { Database } from "@/integrations/supabase/types";
+import { formatToIDR } from "@/utils/currency";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
@@ -31,7 +32,7 @@ export function ServiceCard({ service, serviceType, title, description, price, l
         <CardHeader>
           <CardTitle className="flex justify-between items-start">
             <span>{title}</span>
-            <span className="text-primary">${price} {priceLabel}</span>
+            <span className="text-primary">{formatToIDR(price)} {priceLabel}</span>
           </CardTitle>
           {location && (
             <CardDescription className="flex items-center gap-1">

@@ -1,3 +1,5 @@
+import { formatToIDR } from "@/utils/currency";
+
 interface SummaryItemProps {
   name: string;
   price: number;
@@ -12,7 +14,7 @@ export function SummaryItem({ name, price, type }: SummaryItemProps) {
           <p className="font-medium">{name}</p>
           <p className="text-sm text-muted-foreground">{type}</p>
         </div>
-        <p className="font-medium">${price.toFixed(2)}</p>
+        <p className="font-medium">{formatToIDR(price)}</p>
       </div>
     </div>
   );

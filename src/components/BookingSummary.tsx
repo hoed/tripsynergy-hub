@@ -5,6 +5,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { calculateAccommodationPrice, calculatePerPersonPrice } from "@/utils/bookingCalculations";
 import { useToast } from "@/hooks/use-toast";
 import { BookingList } from "./booking/BookingList";
+import { formatToIDR } from "@/utils/currency";
 
 interface SummaryItem {
   name: string;
@@ -208,13 +209,13 @@ export function BookingSummary() {
         <div className="pt-4 border-t space-y-2">
           <div className="flex justify-between items-center">
             <p className="font-semibold">Subtotal</p>
-            <p className="font-semibold">${totalPrice.toFixed(2)}</p>
+            <p className="font-semibold">{formatToIDR(totalPrice)}</p>
           </div>
           {isStaff && (
             <>
               <div className="flex justify-between items-center text-primary">
                 <p>Total with Profit</p>
-                <p>${totalWithProfit.toFixed(2)}</p>
+                <p>{formatToIDR(totalWithProfit)}</p>
               </div>
             </>
           )}

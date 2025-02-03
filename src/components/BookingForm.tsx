@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { formatToIDR } from "@/utils/currency";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
@@ -129,7 +130,7 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
 
       {dateRange?.from && dateRange?.to && (
         <div className="text-lg font-semibold">
-          Total Price: ${calculateTotalPrice().toFixed(2)}
+          Total Price: {formatToIDR(calculateTotalPrice())}
         </div>
       )}
 
