@@ -32,12 +32,16 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
   const calculateTotalPrice = () => {
     if (!dateRange?.from || !dateRange?.to) return 0;
     
-    const days = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)) || 1;
     
     if ('price_per_night' in service) {
       return service.price_per_night * days;
     } else if ('price_per_person' in service) {
-      return service.price_per_person * numberOfPeople * (serviceType === 'transportation' ? 1 : days);
+      if (serviceType === 'transportation') {
+        // For transportation, we don't multiply by days
+        return service.price_per_person * numberOfPeople;
+      }
+      return service.price_per_person * numberOfPeople * days;
     }
     
     return 0;
@@ -112,7 +116,9 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Number of {serviceType === 'transportation' ? 'Items' : 'People'}</label>
+        <label className="text-sm font-medium">
+          {serviceType === 'transportation' ? 'Number of Items' : 'Number of People'}
+        </label>
         <Input
           type="number"
           min={1}
@@ -123,7 +129,7 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
 
       {dateRange?.from && dateRange?.to && (
         <div className="text-lg font-semibold">
-          Total Price: ${calculateTotalPrice()}
+          Total Price: ${calculateTotalPrice().toFixed(2)}
         </div>
       )}
 

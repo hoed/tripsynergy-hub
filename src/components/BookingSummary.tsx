@@ -5,7 +5,6 @@ import { useAuth } from "@/components/AuthProvider";
 import { calculateAccommodationPrice, calculatePerPersonPrice } from "@/utils/bookingCalculations";
 import { useToast } from "@/hooks/use-toast";
 import { BookingList } from "./booking/BookingList";
-import { format } from "date-fns";
 
 interface SummaryItem {
   name: string;
@@ -67,7 +66,6 @@ export function BookingSummary() {
 
     const items: SummaryItem[] = [];
     let total = 0;
-    let totalProfit = 0;
 
     bookings.forEach(booking => {
       let itemPrice = 0;
@@ -137,13 +135,18 @@ export function BookingSummary() {
           endDate: booking.end_date
         });
         total += itemPrice;
-        totalProfit += itemPrice * (1 + (booking.profit_percentage || 0) / 100);
       }
     });
 
     setSummaryItems(items);
     setTotalPrice(total);
-    setTotalWithProfit(totalProfit);
+
+    // Calculate total with profit after all items are processed
+    const totalWithProfit = items.reduce((acc, item) => {
+      const itemWithProfit = item.price * (1 + (item.profitPercentage || 0) / 100);
+      return acc + itemWithProfit;
+    }, 0);
+    setTotalWithProfit(totalWithProfit);
   };
 
   useEffect(() => {
