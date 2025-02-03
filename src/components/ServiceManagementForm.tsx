@@ -65,7 +65,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
     if (serviceType === "accommodations") {
       total = data.price * (data.nights || 1) * (data.persons || 1);
     } else if (serviceType === "transportation") {
-      total = data.price * (data.days || 1);
+      total = data.price * (data.persons || 1);
     } else if (serviceType === "attractions" || serviceType === "meals") {
       total = data.price * (data.persons || 1);
     }
@@ -110,7 +110,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
         serviceData = {
           type: data.type,
           description: data.description,
-          price_per_person: data.price,
+          price_per_item: data.price,
           created_by: user.id,
         };
       } else {
@@ -148,8 +148,6 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
       setIsSubmitting(false);
     }
   };
-
-  // ... keep existing code (form JSX)
 
   return (
     <Form {...form}>
@@ -203,7 +201,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Price {serviceType === "accommodations" ? "(per night)" : "(per person)"}
+                Price {serviceType === "transportation" ? "(per item)" : "(per person)"}
               </FormLabel>
               <FormControl>
                 <Input 

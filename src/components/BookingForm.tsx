@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
+import { DateRange } from "react-day-picker";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
@@ -23,15 +24,14 @@ interface BookingFormProps {
 export function BookingForm({ service, serviceType, onSuccess, onCancel }: BookingFormProps) {
   const { session } = useAuth();
   const { toast } = useToast();
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const calculateTotalPrice = () => {
-    if (!startDate || !endDate) return 0;
+    if (!dateRange?.from || !dateRange?.to) return 0;
     
-    const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
     
     if ('price_per_night' in service) {
       return service.price_per_night * days;
@@ -44,7 +44,7 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!session?.user?.id || !startDate || !endDate) {
+    if (!session?.user?.id || !dateRange?.from || !dateRange?.to) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -59,8 +59,8 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
     try {
       const bookingData = {
         client_id: session.user.id,
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
+        start_date: dateRange.from.toISOString(),
+        end_date: dateRange.to.toISOString(),
         number_of_people: numberOfPeople,
         total_price: totalPrice,
         [`${serviceType.slice(0, -1)}_id`]: service.id,
@@ -93,23 +93,13 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <label className="text-sm font-medium">Start Date</label>
+        <label className="text-sm font-medium">Select Dates</label>
         <Calendar
-          mode="single"
-          selected={startDate}
-          onSelect={setStartDate}
+          mode="range"
+          selected={dateRange}
+          onSelect={setDateRange}
+          numberOfMonths={2}
           disabled={(date) => date < new Date()}
-          className="rounded-md border"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">End Date</label>
-        <Calendar
-          mode="single"
-          selected={endDate}
-          onSelect={setEndDate}
-          disabled={(date) => !startDate || date <= startDate}
           className="rounded-md border"
         />
       </div>
@@ -124,7 +114,7 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
         />
       </div>
 
-      {startDate && endDate && (
+      {dateRange?.from && dateRange?.to && (
         <div className="text-lg font-semibold">
           Total Price: ${calculateTotalPrice()}
         </div>

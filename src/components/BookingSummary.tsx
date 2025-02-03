@@ -17,6 +17,7 @@ interface SummaryItem {
 export function BookingSummary() {
   const [summaryItems, setSummaryItems] = useState<SummaryItem[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [totalWithProfit, setTotalWithProfit] = useState(0);
   const [isStaff, setIsStaff] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -58,13 +59,17 @@ export function BookingSummary() {
       if (!bookings || bookings.length === 0) {
         setSummaryItems([]);
         setTotalPrice(0);
+        setTotalWithProfit(0);
         return;
       }
 
       const items: SummaryItem[] = [];
       let total = 0;
+      let totalProfit = 0;
 
       bookings.forEach(booking => {
+        let itemPrice = 0;
+        
         if (booking.accommodations) {
           const accommodationPrice = calculateAccommodationPrice(
             booking.accommodations,
@@ -72,12 +77,12 @@ export function BookingSummary() {
             booking.end_date
           );
           if (accommodationPrice) {
+            itemPrice = accommodationPrice.price;
             items.push({
               ...accommodationPrice,
               bookingId: booking.id,
               profitPercentage: booking.profit_percentage
             });
-            total += accommodationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
           }
         }
 
@@ -88,12 +93,12 @@ export function BookingSummary() {
             'Transportation'
           );
           if (transportationPrice) {
+            itemPrice = transportationPrice.price;
             items.push({
               ...transportationPrice,
               bookingId: booking.id,
               profitPercentage: booking.profit_percentage
             });
-            total += transportationPrice.price * (1 + (booking.profit_percentage || 0) / 100);
           }
         }
 
@@ -104,12 +109,12 @@ export function BookingSummary() {
             'Attraction'
           );
           if (attractionPrice) {
+            itemPrice = attractionPrice.price;
             items.push({
               ...attractionPrice,
               bookingId: booking.id,
               profitPercentage: booking.profit_percentage
             });
-            total += attractionPrice.price * (1 + (booking.profit_percentage || 0) / 100);
           }
         }
 
@@ -120,18 +125,22 @@ export function BookingSummary() {
             'Meal'
           );
           if (mealPrice) {
+            itemPrice = mealPrice.price;
             items.push({
               ...mealPrice,
               bookingId: booking.id,
               profitPercentage: booking.profit_percentage
             });
-            total += mealPrice.price * (1 + (booking.profit_percentage || 0) / 100);
           }
         }
+
+        total += itemPrice;
+        totalProfit += itemPrice * (1 + (booking.profit_percentage || 0) / 100);
       });
 
       setSummaryItems(items);
       setTotalPrice(total);
+      setTotalWithProfit(totalProfit);
     };
 
     fetchBookingsAndCalculate();
@@ -181,11 +190,17 @@ export function BookingSummary() {
           isStaff={isStaff}
           onProfitUpdate={handleProfitUpdate}
         />
-        <div className="pt-4 border-t">
+        <div className="pt-4 border-t space-y-2">
           <div className="flex justify-between items-center">
-            <p className="font-semibold">Total</p>
+            <p className="font-semibold">Subtotal</p>
             <p className="font-semibold">${totalPrice.toFixed(2)}</p>
           </div>
+          {isStaff && (
+            <div className="flex justify-between items-center text-primary">
+              <p>With Profit</p>
+              <p>${totalWithProfit.toFixed(2)}</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
