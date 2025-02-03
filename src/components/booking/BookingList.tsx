@@ -7,6 +7,8 @@ interface BookingListProps {
     type: string;
     bookingId?: string;
     profitPercentage?: number;
+    startDate: string;
+    endDate: string;
   }>;
   isStaff: boolean;
   onProfitUpdate: (bookingId: string, newProfit: number) => void;
