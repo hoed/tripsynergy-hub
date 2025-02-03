@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
+import { formatToIDR } from "@/utils/currency";
 
 interface ServiceFormData {
   name: string;
@@ -324,7 +325,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
         )}
 
         <div className="text-lg font-semibold">
-          Total Price: ${totalPrice.toFixed(2)}
+          Total Price: {formatToIDR(totalPrice)}
         </div>
 
         <Button type="submit" disabled={isSubmitting || !isStaff}>
