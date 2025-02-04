@@ -43,6 +43,15 @@ export function ServiceCard({
 
   const handleDelete = async () => {
     try {
+      // First, delete any associated bookings
+      const { error: bookingsError } = await supabase
+        .from('bookings')
+        .delete()
+        .eq(`${serviceType.slice(0, -1)}_id`, service.id);
+
+      if (bookingsError) throw bookingsError;
+
+      // Then delete the service itself
       const { error } = await supabase
         .from(serviceType)
         .delete()
@@ -57,6 +66,7 @@ export function ServiceCard({
 
       if (onDelete) onDelete();
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         variant: "destructive",
         title: "Error",
