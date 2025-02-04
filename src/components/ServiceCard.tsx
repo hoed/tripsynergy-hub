@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MapPin } from "lucide-react";
+import { MapPin, Trash2 } from "lucide-react";
 import { BookingForm } from "./BookingForm";
 import { Database } from "@/integrations/supabase/types";
 import { formatToIDR } from "@/utils/currency";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "./ui/use-toast";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
@@ -21,19 +23,67 @@ interface ServiceCardProps {
   price: number;
   location?: string;
   priceLabel: string;
+  isStaff: boolean;
+  onDelete?: () => void;
 }
 
-export function ServiceCard({ service, serviceType, title, description, price, location, priceLabel }: ServiceCardProps) {
+export function ServiceCard({ 
+  service, 
+  serviceType, 
+  title, 
+  description, 
+  price, 
+  location, 
+  priceLabel,
+  isStaff,
+  onDelete 
+}: ServiceCardProps) {
   const [showBookingDialog, setShowBookingDialog] = useState(false);
+  const { toast } = useToast();
+
+  const handleDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from(serviceType)
+        .delete()
+        .eq('id', service.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${title} has been deleted.`,
+      });
+
+      if (onDelete) onDelete();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete the item.",
+      });
+    }
+  };
 
   return (
     <>
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="flex justify-between items-start">
-            <span>{title}</span>
-            <span className="text-primary">{formatToIDR(price)} {priceLabel}</span>
-          </CardTitle>
+          <div className="flex justify-between items-start">
+            <CardTitle>{title}</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-primary">{formatToIDR(price)} {priceLabel}</span>
+              {isStaff && (
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
           {location && (
             <CardDescription className="flex items-center gap-1">
               <MapPin className="h-4 w-4" />
