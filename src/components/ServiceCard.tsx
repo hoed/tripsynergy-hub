@@ -63,10 +63,20 @@ export function ServiceCard({
       const bookingColumn = getBookingReferenceColumn(serviceType);
       
       // First, check if we have staff permissions
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "You must be logged in to delete items.",
+        });
+        return;
+      }
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
+        .eq('id', user.id)
         .single();
 
       if (!profile || !['owner', 'operator'].includes(profile.role)) {
@@ -86,12 +96,13 @@ export function ServiceCard({
 
       if (fetchError) throw fetchError;
 
-      // If there are associated bookings, delete them first
+      // If there are associated bookings, delete them first using RLS-enabled delete
       if (bookings && bookings.length > 0) {
         const { error: bookingsError } = await supabase
           .from('bookings')
           .delete()
-          .eq(bookingColumn, service.id);
+          .eq(bookingColumn, service.id)
+          .eq('client_id', user.id); // This ensures RLS policy is satisfied
 
         if (bookingsError) throw bookingsError;
       }
@@ -100,7 +111,8 @@ export function ServiceCard({
       const { error } = await supabase
         .from(serviceType)
         .delete()
-        .eq('id', service.id);
+        .eq('id', service.id)
+        .eq('created_by', user.id); // This ensures RLS policy is satisfied
 
       if (error) throw error;
 
