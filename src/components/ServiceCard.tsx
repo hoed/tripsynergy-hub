@@ -17,15 +17,19 @@ type Service =
 
 type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
 
-// Helper function to get the booking reference column name
-const getBookingReferenceColumn = (serviceType: ServiceType): string => {
-  const mapping = {
-    accommodations: "accommodation_id",
-    transportation: "transportation_id",
-    attractions: "attraction_id",
-    meals: "meal_id"
-  };
-  return mapping[serviceType];
+type BookingReferenceColumn = "accommodation_id" | "transportation_id" | "attraction_id" | "meal_id";
+
+const getBookingReferenceColumn = (serviceType: ServiceType): BookingReferenceColumn => {
+  switch (serviceType) {
+    case "accommodations":
+      return "accommodation_id";
+    case "transportation":
+      return "transportation_id";
+    case "attractions":
+      return "attraction_id";
+    case "meals":
+      return "meal_id";
+  }
 };
 
 interface ServiceCardProps {
