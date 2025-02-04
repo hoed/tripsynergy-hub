@@ -6,8 +6,6 @@ interface BookingItemProps {
     name: string;
     price: number;
     type: string;
-    bookingId?: string;
-    profitPercentage?: number;
     startDate: string;
     endDate: string;
   };
@@ -15,7 +13,7 @@ interface BookingItemProps {
 
 export function BookingItem({ item }: BookingItemProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 flex-1">
       <div className="flex justify-between items-center gap-4">
         <SummaryItem {...item} />
       </div>
