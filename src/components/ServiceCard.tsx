@@ -15,9 +15,22 @@ type Service =
   | Database["public"]["Tables"]["attractions"]["Row"]
   | Database["public"]["Tables"]["meals"]["Row"];
 
+type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
+
+// Helper function to get the booking reference column name
+const getBookingReferenceColumn = (serviceType: ServiceType): string => {
+  const mapping = {
+    accommodations: "accommodation_id",
+    transportation: "transportation_id",
+    attractions: "attraction_id",
+    meals: "meal_id"
+  };
+  return mapping[serviceType];
+};
+
 interface ServiceCardProps {
   service: Service;
-  serviceType: "accommodations" | "transportation" | "attractions" | "meals";
+  serviceType: ServiceType;
   title: string;
   description: string;
   price: number;
@@ -47,7 +60,7 @@ export function ServiceCard({
       const { error: bookingsError } = await supabase
         .from('bookings')
         .delete()
-        .eq(`${serviceType.slice(0, -1)}_id`, service.id);
+        .eq(getBookingReferenceColumn(serviceType), service.id);
 
       if (bookingsError) throw bookingsError;
 
