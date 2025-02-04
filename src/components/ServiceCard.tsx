@@ -96,13 +96,13 @@ export function ServiceCard({
 
       if (fetchError) throw fetchError;
 
-      // If there are associated bookings, delete them first using RLS-enabled delete
+      // If there are associated bookings, delete them first
       if (bookings && bookings.length > 0) {
+        // Staff can delete all associated bookings
         const { error: bookingsError } = await supabase
           .from('bookings')
           .delete()
-          .eq(bookingColumn, service.id)
-          .eq('client_id', user.id); // This ensures RLS policy is satisfied
+          .eq(bookingColumn, service.id);
 
         if (bookingsError) throw bookingsError;
       }
@@ -112,7 +112,7 @@ export function ServiceCard({
         .from(serviceType)
         .delete()
         .eq('id', service.id)
-        .eq('created_by', user.id); // This ensures RLS policy is satisfied
+        .eq('created_by', user.id);
 
       if (error) throw error;
 
