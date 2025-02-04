@@ -2,7 +2,7 @@ import { BookingItem } from "./BookingItem";
 import { Input } from "@/components/ui/input";
 import { formatToIDR } from "@/utils/currency";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Calculator } from "lucide-react";
 
 interface BookingListProps {
   items: Array<{
@@ -59,6 +59,18 @@ export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, tota
               }}
             />
             <span className="text-sm text-muted-foreground">%</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (items[0].bookingId && items[0].profitPercentage) {
+                  onProfitUpdate(items[0].bookingId, items[0].profitPercentage);
+                }
+              }}
+            >
+              <Calculator className="h-4 w-4 mr-2" />
+              Calculate
+            </Button>
           </div>
         )}
       </div>
