@@ -88,37 +88,31 @@ export function ServiceCard({
         return;
       }
 
-      // Then, fetch any associated bookings
-      const { data: bookings, error: fetchError } = await supabase
+      // First, delete all associated bookings
+      const { error: bookingsError } = await supabase
         .from('bookings')
-        .select('id')
+        .delete()
         .eq(bookingColumn, service.id);
 
-      if (fetchError) throw fetchError;
-
-      // If there are associated bookings, delete them first
-      if (bookings && bookings.length > 0) {
-        // Staff can delete all associated bookings
-        const { error: bookingsError } = await supabase
-          .from('bookings')
-          .delete()
-          .eq(bookingColumn, service.id);
-
-        if (bookingsError) throw bookingsError;
+      if (bookingsError) {
+        console.error('Error deleting bookings:', bookingsError);
+        throw bookingsError;
       }
 
-      // Finally delete the service itself
-      const { error } = await supabase
+      // Then delete the service itself
+      const { error: serviceError } = await supabase
         .from(serviceType)
         .delete()
-        .eq('id', service.id)
-        .eq('created_by', user.id);
+        .eq('id', service.id);
 
-      if (error) throw error;
+      if (serviceError) {
+        console.error('Error deleting service:', serviceError);
+        throw serviceError;
+      }
 
       toast({
         title: "Success",
-        description: `${title} has been deleted.`,
+        description: `${title} and associated bookings have been deleted.`,
       });
 
       if (onDelete) onDelete();
@@ -127,7 +121,7 @@ export function ServiceCard({
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete the item. Make sure you have the right permissions.",
+        description: "Failed to delete the item. Please try again.",
       });
     }
   };
