@@ -205,21 +205,16 @@ export function BookingSummary() {
           items={summaryItems}
           isStaff={isStaff}
           onProfitUpdate={handleProfitUpdate}
+          totalPrice={totalPrice}
         />
-        <div className="pt-4 border-t space-y-2">
-          <div className="flex justify-between items-center">
-            <p className="font-semibold">Subtotal</p>
-            <p className="font-semibold">{formatToIDR(totalPrice)}</p>
+        {isStaff && (
+          <div className="pt-2 text-primary">
+            <div className="flex justify-between items-center">
+              <p>Total with Profit</p>
+              <p>{formatToIDR(totalWithProfit)}</p>
+            </div>
           </div>
-          {isStaff && (
-            <>
-              <div className="flex justify-between items-center text-primary">
-                <p>Total with Profit</p>
-                <p>{formatToIDR(totalWithProfit)}</p>
-              </div>
-            </>
-          )}
-        </div>
+        )}
       </CardContent>
     </Card>
   );

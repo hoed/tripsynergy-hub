@@ -25,43 +25,33 @@ interface ServiceNavigationProps {
 export function ServiceNavigation({ selectedTab, setSelectedTab, isMobile }: ServiceNavigationProps) {
   if (isMobile) {
     return (
-      <Breadcrumb>
-        <BreadcrumbList className="flex-wrap">
-          {serviceTypes.map((service, index) => (
-            <div key={service.value} className="flex items-center">
-              {index > 0 && <BreadcrumbSeparator />}
-              <BreadcrumbItem>
-                {selectedTab === service.value ? (
-                  <BreadcrumbPage className="flex items-center gap-1">
-                    <service.icon className="h-4 w-4" />
-                    {service.label}
-                  </BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink 
-                    asChild 
-                    className="flex items-center gap-1"
-                    onClick={() => setSelectedTab(service.value)}
-                  >
-                    <button>
-                      <service.icon className="h-4 w-4" />
-                      {service.label}
-                    </button>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-            </div>
-          ))}
-        </BreadcrumbList>
-      </Breadcrumb>
+      <TabsList className="grid w-full grid-cols-2 gap-2">
+        {serviceTypes.map((service) => (
+          <TabsTrigger
+            key={service.value}
+            value={service.value}
+            className="flex items-center gap-2"
+            onClick={() => setSelectedTab(service.value)}
+          >
+            <service.icon className="h-4 w-4" />
+            {service.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
     );
   }
 
   return (
-    <TabsList className="grid w-full max-w-3xl grid-cols-2 md:grid-cols-4">
-      <TabsTrigger value="accommodations">Accommodations</TabsTrigger>
-      <TabsTrigger value="transportation">Transportation</TabsTrigger>
-      <TabsTrigger value="attractions">Attractions</TabsTrigger>
-      <TabsTrigger value="meals">Meals</TabsTrigger>
+    <TabsList className="grid w-full max-w-3xl grid-cols-4">
+      {serviceTypes.map((service) => (
+        <TabsTrigger
+          key={service.value}
+          value={service.value}
+          onClick={() => setSelectedTab(service.value)}
+        >
+          {service.label}
+        </TabsTrigger>
+      ))}
     </TabsList>
   );
 }
