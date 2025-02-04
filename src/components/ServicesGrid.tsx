@@ -2,10 +2,28 @@ import { useEffect, useState } from "react";
 import { ServiceCard } from "./ServiceCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Database } from "@/integrations/supabase/types";
+
+type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
+
+type Accommodation = Database["public"]["Tables"]["accommodations"]["Row"];
+type Transportation = Database["public"]["Tables"]["transportation"]["Row"];
+type Attraction = Database["public"]["Tables"]["attractions"]["Row"];
+type Meal = Database["public"]["Tables"]["meals"]["Row"];
+
+type Service = Accommodation | Transportation | Attraction | Meal;
 
 interface ServicesGridProps {
-  type: "accommodations" | "transportation" | "attractions" | "meals";
+  type: ServiceType;
 }
+
+const isAccommodation = (service: Service): service is Accommodation => {
+  return 'price_per_night' in service;
+};
+
+const isTransportation = (service: Service): service is Transportation => {
+  return 'type' in service && !('location' in service);
+};
 
 export function ServicesGrid({ type }: ServicesGridProps) {
   const [isStaff, setIsStaff] = useState(false);
@@ -48,6 +66,24 @@ export function ServicesGrid({ type }: ServicesGridProps) {
     }
   };
 
+  const getServiceTitle = (service: Service) => {
+    if (isTransportation(service)) {
+      return service.type;
+    }
+    return 'name' in service ? service.name : '';
+  };
+
+  const getServicePrice = (service: Service) => {
+    if (isAccommodation(service)) {
+      return service.price_per_night;
+    }
+    return 'price_per_person' in service ? service.price_per_person : 0;
+  };
+
+  const getServiceLocation = (service: Service) => {
+    return 'location' in service ? service.location : undefined;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {services.map((service) => (
@@ -55,14 +91,10 @@ export function ServicesGrid({ type }: ServicesGridProps) {
           key={service.id}
           service={service}
           serviceType={type}
-          title={service.name || service.type}
+          title={getServiceTitle(service)}
           description={service.description || ""}
-          price={
-            type === "accommodations"
-              ? service.price_per_night
-              : service.price_per_person
-          }
-          location={service.location}
+          price={getServicePrice(service)}
+          location={getServiceLocation(service)}
           priceLabel={getPriceLabel()}
           isStaff={isStaff}
           onDelete={refetch}
