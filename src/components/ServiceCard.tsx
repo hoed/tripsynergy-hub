@@ -61,10 +61,11 @@ export function ServiceCard({
   const handleDelete = async () => {
     try {
       // First, delete any associated bookings
+      const bookingColumn = getBookingReferenceColumn(serviceType);
       const { error: bookingsError } = await supabase
         .from('bookings')
         .delete()
-        .eq(getBookingReferenceColumn(serviceType), service.id);
+        .eq(bookingColumn, service.id);
 
       if (bookingsError) throw bookingsError;
 
