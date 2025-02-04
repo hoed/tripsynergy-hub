@@ -7,7 +7,7 @@ import { BookingForm } from "./BookingForm";
 import { Database } from "@/integrations/supabase/types";
 import { formatToIDR } from "@/utils/currency";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
@@ -103,7 +103,8 @@ export function ServiceCard({
       const { error: serviceError } = await supabase
         .from(serviceType)
         .delete()
-        .eq('id', service.id);
+        .eq('id', service.id)
+        .eq('created_by', user.id);
 
       if (serviceError) {
         console.error('Error deleting service:', serviceError);
