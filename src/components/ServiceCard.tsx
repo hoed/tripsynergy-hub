@@ -60,14 +60,25 @@ export function ServiceCard({
 
   const handleDelete = async () => {
     try {
-      // First, delete any associated bookings
       const bookingColumn = getBookingReferenceColumn(serviceType);
-      const { error: bookingsError } = await supabase
+      
+      // First, fetch any associated bookings
+      const { data: bookings, error: fetchError } = await supabase
         .from('bookings')
-        .delete()
+        .select('id')
         .eq(bookingColumn, service.id);
 
-      if (bookingsError) throw bookingsError;
+      if (fetchError) throw fetchError;
+
+      // If there are associated bookings, delete them first
+      if (bookings && bookings.length > 0) {
+        const { error: bookingsError } = await supabase
+          .from('bookings')
+          .delete()
+          .eq(bookingColumn, service.id);
+
+        if (bookingsError) throw bookingsError;
+      }
 
       // Then delete the service itself
       const { error } = await supabase
