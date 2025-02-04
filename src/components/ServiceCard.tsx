@@ -62,7 +62,23 @@ export function ServiceCard({
     try {
       const bookingColumn = getBookingReferenceColumn(serviceType);
       
-      // First, fetch any associated bookings
+      // First, check if we have staff permissions
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (!profile || !['owner', 'operator'].includes(profile.role)) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "You don't have permission to delete this item.",
+        });
+        return;
+      }
+
+      // Then, fetch any associated bookings
       const { data: bookings, error: fetchError } = await supabase
         .from('bookings')
         .select('id')
@@ -80,7 +96,7 @@ export function ServiceCard({
         if (bookingsError) throw bookingsError;
       }
 
-      // Then delete the service itself
+      // Finally delete the service itself
       const { error } = await supabase
         .from(serviceType)
         .delete()
@@ -99,7 +115,7 @@ export function ServiceCard({
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete the item.",
+        description: "Failed to delete the item. Make sure you have the right permissions.",
       });
     }
   };
