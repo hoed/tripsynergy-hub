@@ -49,11 +49,16 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
     const checkStaffStatus = async () => {
       if (!user?.id) return;
       
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return;
+      }
 
       setIsStaff(profile?.role === 'owner' || profile?.role === 'operator');
     };
