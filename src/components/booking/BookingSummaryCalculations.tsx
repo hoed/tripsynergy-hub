@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { formatToIDR } from "@/utils/currency";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,14 @@ export function BookingSummaryCalculations({
   onCalculate,
   calculatedTotal,
 }: BookingSummaryCalculationsProps) {
+  const [pricePerPax, setPricePerPax] = useState<number>(0);
+
+  useEffect(() => {
+    if (numberOfPersons > 0) {
+      setPricePerPax(calculatedTotal / numberOfPersons);
+    }
+  }, [calculatedTotal, numberOfPersons]);
+
   return (
     <div className="pt-4 border-t space-y-2">
       <div className="flex justify-between items-center">
@@ -86,7 +95,7 @@ export function BookingSummaryCalculations({
       {isStaff && (
         <div className="flex justify-between items-center">
           <p className="font-semibold">Price per pax</p>
-          <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
+          <p className="font-semibold">{formatToIDR(pricePerPax)}</p>
         </div>
       )}
     </div>
