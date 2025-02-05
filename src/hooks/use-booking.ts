@@ -16,21 +16,26 @@ interface SummaryItem {
 
 export function useBookingSummary() {
   const [summaryItems, setSummaryItems] = useState<SummaryItem[]>([]);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [totalWithProfit, setTotalWithProfit] = useState(0);
-  const [isStaff, setIsStaff] = useState(false);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [totalWithProfit, setTotalWithProfit] = useState<number>(0);
+  const [isStaff, setIsStaff] = useState<boolean>(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
     const checkStaffStatus = async () => {
       if (!user) return;
-      const { data: role } = await supabase
+      const { data: role, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
       
+      if (error) {
+        console.error('Error fetching user role:', error);
+        return;
+      }
+
       setIsStaff(role?.role === 'owner' || role?.role === 'operator');
     };
     checkStaffStatus();
