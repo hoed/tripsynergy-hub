@@ -42,7 +42,13 @@ export function useBookingSummary() {
     const { data: bookings, error } = await supabase
       .from('bookings')
       .select(`
-        *,
+        id,
+        client_id,
+        start_date,
+        end_date,
+        number_of_people,
+        total_price,
+        profit_percentage,
         accommodations (name, price_per_night),
         transportation (type, price_per_person),
         attractions (name, price_per_person),
