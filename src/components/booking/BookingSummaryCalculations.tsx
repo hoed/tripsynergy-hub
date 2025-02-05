@@ -68,10 +68,13 @@ export function BookingSummaryCalculations({
             <Calculator className="h-4 w-4 mr-2" />
             Calculate
           </Button>
-          <div className="flex justify-between items-center">
+      
+          {isStaff && (
+        <div className="flex justify-between items-center">
           <p className="font-semibold">Profit</p>
           <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
-        </div
+        </div>
+      )}
         </div>
       )}
 
