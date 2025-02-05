@@ -1,4 +1,4 @@
-import { Hotel, Bus, MapPin, Utensils } from "lucide-react";
+import { Hotel, Bus, MapPin, Utensils, Package } from "lucide-react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Breadcrumb,
@@ -14,6 +14,7 @@ export const serviceTypes = [
   { value: "transportation", label: "Transportation", icon: Bus },
   { value: "attractions", label: "Attractions", icon: MapPin },
   { value: "meals", label: "Meals", icon: Utensils },
+  { value: "additional_services", label: "Additional Items", icon: Package },
 ];
 
 interface ServiceNavigationProps {
