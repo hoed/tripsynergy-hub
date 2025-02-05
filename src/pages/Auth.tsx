@@ -166,7 +166,7 @@ const Auth = () => {
           <Logo size="lg" className="w-auto h-16 md:h-20 mb-8" />
         </div>
         
-        <Card className="w-full">
+        <Card className="w-full bg-custom-dark">
           <CardHeader>
             <CardTitle className="text-center">Welcome</CardTitle>
             <CardDescription className="text-center">
