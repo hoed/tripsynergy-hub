@@ -31,7 +31,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
@@ -80,7 +80,7 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Desktop Navigation */}
           <div className="hidden md:block space-y-4">
@@ -105,6 +105,11 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t py-4 text-center text-sm text-gray-600 dark:text-gray-400">
+        © 2025. Hoed's Project. All Rights Reserved
+      </footer>
     </div>
   );
 }
