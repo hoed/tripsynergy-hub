@@ -1,9 +1,8 @@
-import { BookingItem } from "./BookingItem";
-import { Input } from "@/components/ui/input";
-import { formatToIDR } from "@/utils/currency";
-import { Button } from "@/components/ui/button";
-import { Trash2, Calculator } from "lucide-react";
 import { useState, useEffect } from "react";
+import { BookingItem } from "./BookingItem";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { BookingSummaryCalculations } from "./BookingSummaryCalculations";
 
 interface BookingListProps {
   items: Array<{
@@ -21,12 +20,18 @@ interface BookingListProps {
   totalPrice: number;
 }
 
-export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, totalPrice }: BookingListProps) {
+export function BookingList({ 
+  items, 
+  isStaff, 
+  onProfitUpdate, 
+  onDeleteItem, 
+  totalPrice 
+}: BookingListProps) {
   const [currentProfit, setCurrentProfit] = useState<number>(items[0]?.profitPercentage || 0);
   const [calculatedTotal, setCalculatedTotal] = useState<number>(totalPrice);
+  const [numberOfPersons, setNumberOfPersons] = useState<number>(1);
 
   useEffect(() => {
-    // Update calculated total whenever items or totalPrice changes
     if (items[0]?.profitPercentage) {
       const profitAmount = totalPrice * (items[0].profitPercentage / 100);
       setCalculatedTotal(totalPrice + profitAmount);
@@ -73,45 +78,17 @@ export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, tota
           )}
         </div>
       ))}
-      <div className="pt-4 border-t space-y-2">
-        <div className="flex justify-between items-center">
-          <p className="font-semibold">Subtotal</p>
-          <p className="font-semibold">{formatToIDR(totalPrice)}</p>
-        </div>
-        {isStaff && items.length > 0 && items[0].bookingId && (
-          <>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Profit Percentage:</span>
-              <Input
-                type="number"
-                min="0"
-                max="100"
-                value={currentProfit}
-                className="w-24"
-                onChange={(e) => {
-                  const value = parseFloat(e.target.value);
-                  if (!isNaN(value)) {
-                    handleProfitChange(value);
-                  }
-                }}
-              />
-              <span className="text-sm text-muted-foreground">%</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCalculate}
-              >
-                <Calculator className="h-4 w-4 mr-2" />
-                Calculate
-              </Button>
-            </div>
-            <div className="flex justify-between items-center">
-              <p className="font-semibold">Total with Profit</p>
-              <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
-            </div>
-          </>
-        )}
-      </div>
+      
+      <BookingSummaryCalculations
+        totalPrice={totalPrice}
+        isStaff={isStaff}
+        currentProfit={currentProfit}
+        numberOfPersons={numberOfPersons}
+        onProfitChange={handleProfitChange}
+        onPersonsChange={setNumberOfPersons}
+        onCalculate={handleCalculate}
+        calculatedTotal={calculatedTotal}
+      />
     </div>
   );
 }
