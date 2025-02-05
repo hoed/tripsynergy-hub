@@ -99,6 +99,7 @@ export function BookingSummaryCalculations({
           <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
         </div>
       )}
+
       {isStaff && (
         <div className="flex justify-between items-center">
           <p className="font-semibold">Price per pax</p>
