@@ -42,6 +42,8 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
+      
+      // First, check if we have staff permissions
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -91,7 +93,7 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
         throw serviceError;
       }
 
-      // Invalidate both the services and bookings queries to refresh the UI
+      // Invalidate both the services and bookings queries to refresh the lists
       queryClient.invalidateQueries({ queryKey: [serviceType] });
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
 
