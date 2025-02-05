@@ -70,7 +70,7 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
       }
 
       const bookingColumn = getBookingReferenceColumn(serviceType);
-      
+
       // First, delete all associated bookings
       const { error: bookingsError } = await supabase
         .from('bookings')
