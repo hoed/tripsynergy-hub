@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
@@ -95,7 +95,7 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
         throw serviceError;
       }
 
-      // Invalidate both the services and bookings queries to refresh the lists
+      // Invalidate both queries to refresh the lists
       queryClient.invalidateQueries({ queryKey: [serviceType] });
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
 
@@ -124,7 +124,11 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
       onClick={handleDelete}
       disabled={isDeleting}
     >
-      <Trash2 className="h-4 w-4" />
+      {isDeleting ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Trash2 className="h-4 w-4" />
+      )}
     </Button>
   );
 }
