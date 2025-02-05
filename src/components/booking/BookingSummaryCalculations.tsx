@@ -26,17 +26,19 @@ export function BookingSummaryCalculations({
   calculatedTotal,
 }: BookingSummaryCalculationsProps) {
   const [pricePerPax, setPricePerPax] = useState<number>(0);
+  const [totalWithProfit, setTotalWithProfit] = useState<number>(calculatedTotal);
 
   useEffect(() => {
     if (numberOfPersons > 0) {
-      setPricePerPax(calculatedTotal / numberOfPersons);
+      setPricePerPax(totalPrice / numberOfPersons);
     }
-  }, [calculatedTotal, numberOfPersons]);
+  }, [totalPrice, numberOfPersons]);
 
   const handleCalculate = () => {
-    const profit = totalPrice * (currentProfit / 100);
-    const totalWithProfit = totalPrice + profit;
-    onCalculate(totalWithProfit);
+    const profit = pricePerPax * (currentProfit / 100);
+    const newTotalWithProfit = pricePerPax + profit;
+    setTotalWithProfit(newTotalWithProfit);
+    onCalculate(newTotalWithProfit);
   };
 
   return (
@@ -89,14 +91,14 @@ export function BookingSummaryCalculations({
       {isStaff && (
         <div className="flex justify-between items-center">
           <p className="font-semibold">Profit</p>
-          <p className="font-semibold">{formatToIDR(totalPrice * (currentProfit / 100))}</p>
+          <p className="font-semibold">{formatToIDR(pricePerPax * (currentProfit / 100))}</p>
         </div>
       )}
 
       {isStaff && (
         <div className="flex justify-between items-center">
           <p className="font-semibold">Total Price</p>
-          <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
+          <p className="font-semibold">{formatToIDR(totalWithProfit)}</p>
         </div>
       )}
 
