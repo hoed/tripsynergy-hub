@@ -73,15 +73,28 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
 
       const bookingColumn = getBookingReferenceColumn(serviceType);
 
-      // First, delete all associated bookings
-      const { error: bookingsError } = await supabase
+      // First, check if there are any associated bookings
+      const { data: bookings, error: bookingsCheckError } = await supabase
         .from('bookings')
-        .delete()
+        .select('id')
         .eq(bookingColumn, service.id);
 
-      if (bookingsError) {
-        console.error('Error deleting bookings:', bookingsError);
-        throw bookingsError;
+      if (bookingsCheckError) {
+        console.error('Error checking bookings:', bookingsCheckError);
+        throw bookingsCheckError;
+      }
+
+      if (bookings && bookings.length > 0) {
+        // Delete all associated bookings first
+        const { error: bookingsDeletionError } = await supabase
+          .from('bookings')
+          .delete()
+          .eq(bookingColumn, service.id);
+
+        if (bookingsDeletionError) {
+          console.error('Error deleting bookings:', bookingsDeletionError);
+          throw bookingsDeletionError;
+        }
       }
 
       // Then delete the service itself
