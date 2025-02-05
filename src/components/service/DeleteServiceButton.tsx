@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Database } from "@/integrations/supabase/types";
+import { useQueryClient } from "@tanstack/react-query";
 
 type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
 type Service = 
@@ -36,6 +37,7 @@ interface DeleteServiceButtonProps {
 export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteServiceButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     try {
@@ -88,6 +90,10 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
         console.error('Error deleting service:', serviceError);
         throw serviceError;
       }
+
+      // Invalidate both the services and bookings queries to refresh the UI
+      queryClient.invalidateQueries({ queryKey: [serviceType] });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
 
       toast({
         title: "Success",
