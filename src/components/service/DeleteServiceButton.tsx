@@ -40,6 +40,8 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
   const queryClient = useQueryClient();
 
   const handleDelete = async () => {
+    if (isDeleting) return;
+
     try {
       setIsDeleting(true);
       
