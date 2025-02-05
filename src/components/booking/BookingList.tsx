@@ -3,6 +3,7 @@ import { BookingItem } from "./BookingItem";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { BookingSummaryCalculations } from "./BookingSummaryCalculations";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BookingListProps {
   items: Array<{
@@ -56,7 +57,19 @@ export function BookingList({
     setCalculatedTotal(totalPrice + profitAmount);
   };
 
-  const handleDelete = (bookingId: string) => {
+  const handleDelete = async (bookingId: string) => {
+    // Delete the item from Supabase database
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', bookingId);
+
+    if (error) {
+      console.error("Error deleting booking:", error);
+      return;
+    }
+
+    // Call the onDeleteItem function to update the state in the parent component
     onDeleteItem(bookingId);
   };
 
