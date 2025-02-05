@@ -78,7 +78,7 @@ export function BookingSummaryCalculations({
         </div>
         <div  className="flex justify-between items-center">
           <p className="font-semibold">Price per pax</p>
-      
+        </div>
       )}
     </div>
   );
