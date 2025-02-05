@@ -52,10 +52,8 @@ export function BookingList({
   };
 
   const handleCalculate = () => {
-    if (items[0]?.bookingId) {
-      const profitAmount = totalPrice * (currentProfit / 100);
-      setCalculatedTotal(totalPrice + profitAmount);
-    }
+    const profitAmount = totalPrice * (currentProfit / 100);
+    setCalculatedTotal(totalPrice + profitAmount);
   };
 
   return (
