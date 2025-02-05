@@ -111,7 +111,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
         serviceData = {
           type: data.type,
           description: data.description,
-          price_per_item: data.price,
+          price_per_person: data.price,
           created_by: user.id,
         };
       } else {
