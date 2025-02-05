@@ -271,7 +271,7 @@ const Auth = () => {
             )}
           </CardContent>
           <CardFooter className="flex flex-col text-center text-sm text-gray-600 dark:text-gray-400 space-y-2">
-            <p>By signing up, you agree to our Terms of Service and Privacy Policy</p>
+            <p>By signing up, you agree to our Terms of <a href="/tos.html" className="underline">Terms of Service</a> and <a href="/privacy.html" className="underline">Privacy Policy</a></p>
             <p>© 2025. Hoed's Project. All Rights Reserved</p>
           </CardFooter>
         </Card>
