@@ -103,8 +103,7 @@ export function ServiceCard({
       const { error: serviceError } = await supabase
         .from(serviceType)
         .delete()
-        .eq('id', service.id)
-        .eq('created_by', user.id);
+        .eq('id', service.id);
 
       if (serviceError) {
         console.error('Error deleting service:', serviceError);
