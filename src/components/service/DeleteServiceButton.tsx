@@ -42,9 +42,9 @@ export function DeleteServiceButton({ service, serviceType, onDelete }: DeleteSe
   const handleDelete = async () => {
     if (isDeleting) return;
 
+    setIsDeleting(true);
+
     try {
-      setIsDeleting(true);
-      
       // First, check if we have staff permissions
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

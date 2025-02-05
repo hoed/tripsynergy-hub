@@ -39,7 +39,7 @@ export function ServiceCard({
   isStaff,
   onDelete 
 }: ServiceCardProps) {
-  const [showBookingDialog, setShowBookingDialog] = useState(false);
+  const [showBookingDialog, setShowBookingDialog] = useState<boolean>(false);
 
   return (
     <>
