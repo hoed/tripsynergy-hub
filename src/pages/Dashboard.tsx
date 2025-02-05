@@ -67,6 +67,9 @@ export default function Dashboard() {
                       <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/meals")}>
                         Meals
                       </Button>
+                      <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/additional_services")}>
+                        Additional Items
+                      </Button>
                     </div>
                   </SheetContent>
                 </Sheet>
