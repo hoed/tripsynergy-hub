@@ -54,10 +54,26 @@ export function useBookingSummary() {
         number_of_people,
         total_price,
         profit_percentage,
-        accommodations (name, price_per_night),
-        transportation (type, price_per_person),
-        attractions (name, price_per_person),
-        meals (name, price_per_person)
+        transportation_id,
+        accommodation_id,
+        attraction_id,
+        meal_id,
+        accommodations (
+          name,
+          price_per_night
+        ),
+        transportation (
+          type,
+          price_per_person
+        ),
+        attractions (
+          name,
+          price_per_person
+        ),
+        meals (
+          name,
+          price_per_person
+        )
       `)
       .eq('client_id', user.id);
 
