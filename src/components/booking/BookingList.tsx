@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { formatToIDR } from "@/utils/currency";
 import { Button } from "@/components/ui/button";
 import { Trash2, Calculator } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface BookingListProps {
   items: Array<{
@@ -22,11 +22,35 @@ interface BookingListProps {
 }
 
 export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, totalPrice }: BookingListProps) {
-  const [totalWithProfit, setTotalWithProfit] = useState(totalPrice);
+  const [currentProfit, setCurrentProfit] = useState<number>(items[0]?.profitPercentage || 0);
+  const [calculatedTotal, setCalculatedTotal] = useState<number>(totalPrice);
 
-  const calculateTotalWithProfit = (profitPercentage: number) => {
-    const profitAmount = totalPrice * (profitPercentage / 100);
-    return totalPrice + profitAmount;
+  useEffect(() => {
+    // Update calculated total whenever items or totalPrice changes
+    if (items[0]?.profitPercentage) {
+      const profitAmount = totalPrice * (items[0].profitPercentage / 100);
+      setCalculatedTotal(totalPrice + profitAmount);
+      setCurrentProfit(items[0].profitPercentage);
+    } else {
+      setCalculatedTotal(totalPrice);
+      setCurrentProfit(0);
+    }
+  }, [items, totalPrice]);
+
+  const handleProfitChange = (value: number) => {
+    setCurrentProfit(value);
+    if (items[0]?.bookingId) {
+      onProfitUpdate(items[0].bookingId, value);
+      const profitAmount = totalPrice * (value / 100);
+      setCalculatedTotal(totalPrice + profitAmount);
+    }
+  };
+
+  const handleCalculate = () => {
+    if (items[0]?.bookingId) {
+      const profitAmount = totalPrice * (currentProfit / 100);
+      setCalculatedTotal(totalPrice + profitAmount);
+    }
   };
 
   return (
@@ -38,7 +62,11 @@ export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, tota
             <Button
               variant="destructive"
               size="icon"
-              onClick={() => onDeleteItem(item.bookingId!)}
+              onClick={() => {
+                if (item.bookingId) {
+                  onDeleteItem(item.bookingId);
+                }
+              }}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -58,12 +86,12 @@ export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, tota
                 type="number"
                 min="0"
                 max="100"
-                defaultValue={items[0].profitPercentage || 0}
+                value={currentProfit}
                 className="w-24"
                 onChange={(e) => {
                   const value = parseFloat(e.target.value);
-                  if (!isNaN(value) && items[0].bookingId) {
-                    onProfitUpdate(items[0].bookingId, value);
+                  if (!isNaN(value)) {
+                    handleProfitChange(value);
                   }
                 }}
               />
@@ -71,12 +99,7 @@ export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, tota
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  if (items[0].bookingId && items[0].profitPercentage) {
-                    onProfitUpdate(items[0].bookingId, items[0].profitPercentage);
-                    setTotalWithProfit(calculateTotalWithProfit(items[0].profitPercentage));
-                  }
-                }}
+                onClick={handleCalculate}
               >
                 <Calculator className="h-4 w-4 mr-2" />
                 Calculate
@@ -84,7 +107,7 @@ export function BookingList({ items, isStaff, onProfitUpdate, onDeleteItem, tota
             </div>
             <div className="flex justify-between items-center">
               <p className="font-semibold">Total with Profit</p>
-              <p className="font-semibold">{formatToIDR(totalWithProfit)}</p>
+              <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
             </div>
           </>
         )}
