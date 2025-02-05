@@ -11,7 +11,7 @@ interface BookingSummaryCalculationsProps {
   numberOfPersons: number;
   onProfitChange: (value: number) => void;
   onPersonsChange: (value: number) => void;
-  onCalculate: () => void;
+  onCalculate: (calculatedTotal: number) => void;
   calculatedTotal: number;
 }
 
@@ -32,6 +32,12 @@ export function BookingSummaryCalculations({
       setPricePerPax(calculatedTotal / numberOfPersons);
     }
   }, [calculatedTotal, numberOfPersons]);
+
+  const handleCalculate = () => {
+    const profit = totalPrice * (currentProfit / 100);
+    const totalWithProfit = totalPrice + profit;
+    onCalculate(totalWithProfit);
+  };
 
   return (
     <div className="pt-4 border-t space-y-2">
@@ -73,16 +79,17 @@ export function BookingSummaryCalculations({
             }}
           />
           <span className="text-sm text-muted-foreground">%</span>
-          <Button variant="outline" size="sm" onClick={onCalculate}>
+          <Button variant="outline" size="sm" onClick={handleCalculate}>
             <Calculator className="h-4 w-4 mr-2" />
             Calculate
           </Button>
         </div>
       )}
+
       {isStaff && (
         <div className="flex justify-between items-center">
           <p className="font-semibold">Profit</p>
-          <p className="font-semibold">{formatToIDR(calculatedTotal)}</p>
+          <p className="font-semibold">{formatToIDR(totalPrice * (currentProfit / 100))}</p>
         </div>
       )}
 
