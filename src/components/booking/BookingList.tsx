@@ -56,6 +56,10 @@ export function BookingList({
     setCalculatedTotal(totalPrice + profitAmount);
   };
 
+  const handleDelete = (bookingId: string) => {
+    onDeleteItem(bookingId);
+  };
+
   return (
     <div className="space-y-4">
       {items.map((item, index) => (
@@ -65,11 +69,7 @@ export function BookingList({
             <Button
               variant="destructive"
               size="icon"
-              onClick={() => {
-                if (item.bookingId) {
-                  onDeleteItem(item.bookingId);
-                }
-              }}
+              onClick={() => handleDelete(item.bookingId!)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
