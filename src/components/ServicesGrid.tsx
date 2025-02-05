@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ServiceCard } from "./ServiceCard";
+import { ServiceCard } from "./service/ServiceCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Database } from "@/integrations/supabase/types";
