@@ -22,6 +22,9 @@ export function ProfitCalculations({
 }: ProfitCalculationsProps) {
   if (!isStaff) return null;
 
+  const profitAmount = pricePerPax * (currentProfit / 100);
+  const totalPriceWithProfit = pricePerPax + profitAmount;
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
@@ -48,12 +51,12 @@ export function ProfitCalculations({
 
       <div className="flex justify-between items-center">
         <p className="font-semibold">Profit</p>
-        <p className="font-semibold">{formatToIDR(pricePerPax * (currentProfit / 100))}</p>
+        <p className="font-semibold">{formatToIDR(profitAmount)}</p>
       </div>
 
       <div className="flex justify-between items-center">
         <p className="font-semibold">Total Price</p>
-        <p className="font-semibold">{formatToIDR(totalWithProfit)}</p>
+        <p className="font-semibold">{formatToIDR(totalPriceWithProfit)}</p>
       </div>
 
       <div className="flex justify-between items-center">
