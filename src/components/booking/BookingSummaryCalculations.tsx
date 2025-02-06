@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { formatToIDR } from "@/utils/currency";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Calculator } from "lucide-react";
+import { ProfitCalculations } from "./ProfitCalculations";
 
 interface BookingSummaryCalculationsProps {
   totalPrice: number;
@@ -11,7 +10,7 @@ interface BookingSummaryCalculationsProps {
   numberOfPersons: number;
   onProfitChange: (value: number) => void;
   onPersonsChange: (value: number) => void;
-  onCalculate: (calculatedTotal: number) => void;
+  onCalculate: () => void;
   calculatedTotal: number;
 }
 
@@ -26,20 +25,12 @@ export function BookingSummaryCalculations({
   calculatedTotal,
 }: BookingSummaryCalculationsProps) {
   const [pricePerPax, setPricePerPax] = useState<number>(0);
-  const [totalWithProfit, setTotalWithProfit] = useState<number>(calculatedTotal);
 
   useEffect(() => {
     if (numberOfPersons > 0) {
       setPricePerPax(totalPrice / numberOfPersons);
     }
   }, [totalPrice, numberOfPersons]);
-
-  const handleCalculate = () => {
-    const profit = pricePerPax * (currentProfit / 100);
-    const newTotalWithProfit = pricePerPax + profit;
-    setTotalWithProfit(newTotalWithProfit);
-    onCalculate(newTotalWithProfit);
-  };
 
   return (
     <div className="pt-4 border-t space-y-2">
@@ -64,50 +55,14 @@ export function BookingSummaryCalculations({
         />
       </div>
 
-      {isStaff && (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Profit Percentage:</span>
-          <Input
-            type="number"
-            min="0"
-            max="100"
-            value={currentProfit}
-            className="w-24"
-            onChange={(e) => {
-              const value = parseFloat(e.target.value);
-              if (!isNaN(value)) {
-                onProfitChange(value);
-              }
-            }}
-          />
-          <span className="text-sm text-muted-foreground">%</span>
-          <Button variant="outline" size="sm" onClick={handleCalculate}>
-            <Calculator className="h-4 w-4 mr-2" />
-            Calculate
-          </Button>
-        </div>
-      )}
-
-      {isStaff && (
-        <div className="flex justify-between items-center">
-          <p className="font-semibold">Profit</p>
-          <p className="font-semibold">{formatToIDR(pricePerPax * (currentProfit / 100))}</p>
-        </div>
-      )}
-
-      {isStaff && (
-        <div className="flex justify-between items-center">
-          <p className="font-semibold">Total Price</p>
-          <p className="font-semibold">{formatToIDR(totalWithProfit)}</p>
-        </div>
-      )}
-
-      {isStaff && (
-        <div className="flex justify-between items-center">
-          <p className="font-semibold">Price per pax</p>
-          <p className="font-semibold">{formatToIDR(pricePerPax)}</p>
-        </div>
-      )}
+      <ProfitCalculations
+        isStaff={isStaff}
+        currentProfit={currentProfit}
+        pricePerPax={pricePerPax}
+        onProfitChange={onProfitChange}
+        onCalculate={onCalculate}
+        totalWithProfit={calculatedTotal}
+      />
     </div>
   );
 }

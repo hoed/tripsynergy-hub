@@ -58,7 +58,6 @@ export function BookingList({
   };
 
   const handleDelete = async (bookingId: string) => {
-    // Delete the item from Supabase database
     const { error } = await supabase
       .from('bookings')
       .delete()
@@ -69,7 +68,6 @@ export function BookingList({
       return;
     }
 
-    // Call the onDeleteItem function to update the state in the parent component
     onDeleteItem(bookingId);
   };
 
