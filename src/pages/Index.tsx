@@ -30,6 +30,7 @@ const Index = () => {
         supabase.from('transportation').select('*'),
         supabase.from('attractions').select('*'),
         supabase.from('meals').select('*'),
+        supabase.from('additional_sevices').select('*'),
       ]);
 
       return {
