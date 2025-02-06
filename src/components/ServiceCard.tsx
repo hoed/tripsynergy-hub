@@ -13,10 +13,9 @@ type Service =
   | Database["public"]["Tables"]["accommodations"]["Row"]
   | Database["public"]["Tables"]["transportation"]["Row"]
   | Database["public"]["Tables"]["attractions"]["Row"]
-  | Database["public"]["Tables"]["meals"]["Row"]
-  | Database["public"]["Tables"]["additional_services"]["Row"];
+  | Database["public"]["Tables"]["meals"]["Row"];
 
-type ServiceType = "accommodations" | "transportation" | "attractions" | "meals" | "additional_services";
+type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
 
 type BookingReferenceColumn = "accommodation_id" | "transportation_id" | "attraction_id" | "meal_id" | "additional_service_id";
 

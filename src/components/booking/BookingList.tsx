@@ -22,7 +22,7 @@ interface BookingListProps {
 }
 
 export function BookingList({ 
-  items, 
+  items = [], // Provide default empty array
   isStaff, 
   onProfitUpdate, 
   onDeleteItem, 
@@ -33,14 +33,12 @@ export function BookingList({
   const [numberOfPersons, setNumberOfPersons] = useState<number>(1);
 
   useEffect(() => {
-    // Initialize currentProfit with the first item's profit percentage if it exists
     if (items.length > 0 && items[0].profitPercentage !== undefined) {
       setCurrentProfit(items[0].profitPercentage);
     }
   }, [items]);
 
   useEffect(() => {
-    // Update calculated total whenever totalPrice or currentProfit changes
     const profitAmount = totalPrice * (currentProfit / 100);
     setCalculatedTotal(totalPrice + profitAmount);
   }, [totalPrice, currentProfit]);
