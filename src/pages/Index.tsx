@@ -15,30 +15,53 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceNavigation } from "@/components/navigation/ServiceNavigation";
 import { ServiceSummary } from "@/components/dashboard/ServiceSummary";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const { signOut } = useAuth();
   const [selectedTab, setSelectedTab] = useState("accommodations");
   const [showServiceForm, setShowServiceForm] = useState(false);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   const { data: summaryData } = useQuery({
     queryKey: ['services-summary'],
     queryFn: async () => {
-      const [accommodations, transportation, attractions, meals, additionalServices] = await Promise.all([
-        supabase.from('accommodations').select('*'),
-        supabase.from('transportation').select('*'),
-        supabase.from('attractions').select('*'),
-        supabase.from('meals').select('*'),
-        supabase.from('additional_services').select('*'), // Fixed typo here
-      ]);
+      try {
+        const [accommodations, transportation, attractions, meals, additionalServices] = await Promise.all([
+          supabase.from('accommodations').select('*'),
+          supabase.from('transportation').select('*'),
+          supabase.from('attractions').select('*'),
+          supabase.from('meals').select('*'),
+          supabase.from('additional_services').select('*'), // Fixed typo here
+        ]);
 
-      return {
-        accommodations: accommodations.data?.length || 0,
-        transportation: transportation.data?.length || 0,
-        attractions: attractions.data?.length || 0,
-        meals: meals.data?.length || 0,
-      };
+        if (accommodations.error) throw accommodations.error;
+        if (transportation.error) throw transportation.error;
+        if (attractions.error) throw attractions.error;
+        if (meals.error) throw meals.error;
+        if (additionalServices.error) throw additionalServices.error;
+
+        return {
+          accommodations: accommodations.data?.length || 0,
+          transportation: transportation.data?.length || 0,
+          attractions: attractions.data?.length || 0,
+          meals: meals.data?.length || 0,
+        };
+      } catch (error) {
+        console.error('Error fetching services summary:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch services summary"
+        });
+        return {
+          accommodations: 0,
+          transportation: 0,
+          attractions: 0,
+          meals: 0,
+        };
+      }
     },
   });
 
