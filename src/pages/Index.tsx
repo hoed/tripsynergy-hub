@@ -25,12 +25,12 @@ const Index = () => {
   const { data: summaryData } = useQuery({
     queryKey: ['services-summary'],
     queryFn: async () => {
-      const [accommodations, transportation, attractions, meals] = await Promise.all([
+      const [accommodations, transportation, attractions, meals, additionalServices] = await Promise.all([
         supabase.from('accommodations').select('*'),
         supabase.from('transportation').select('*'),
         supabase.from('attractions').select('*'),
         supabase.from('meals').select('*'),
-        supabase.from('additional_sevices').select('*'),
+        supabase.from('additional_services').select('*'), // Fixed typo here
       ]);
 
       return {
