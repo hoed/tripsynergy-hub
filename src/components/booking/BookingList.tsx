@@ -28,27 +28,27 @@ export function BookingList({
   onDeleteItem, 
   totalPrice 
 }: BookingListProps) {
-  const [currentProfit, setCurrentProfit] = useState<number>(items[0]?.profitPercentage || 0);
+  const [currentProfit, setCurrentProfit] = useState<number>(0);
   const [calculatedTotal, setCalculatedTotal] = useState<number>(totalPrice);
   const [numberOfPersons, setNumberOfPersons] = useState<number>(1);
 
   useEffect(() => {
-    if (items[0]?.profitPercentage) {
-      const profitAmount = totalPrice * (items[0].profitPercentage / 100);
-      setCalculatedTotal(totalPrice + profitAmount);
+    // Initialize currentProfit with the first item's profit percentage if it exists
+    if (items.length > 0 && items[0].profitPercentage !== undefined) {
       setCurrentProfit(items[0].profitPercentage);
-    } else {
-      setCalculatedTotal(totalPrice);
-      setCurrentProfit(0);
     }
-  }, [items, totalPrice]);
+  }, [items]);
+
+  useEffect(() => {
+    // Update calculated total whenever totalPrice or currentProfit changes
+    const profitAmount = totalPrice * (currentProfit / 100);
+    setCalculatedTotal(totalPrice + profitAmount);
+  }, [totalPrice, currentProfit]);
 
   const handleProfitChange = (value: number) => {
     setCurrentProfit(value);
     if (items[0]?.bookingId) {
       onProfitUpdate(items[0].bookingId, value);
-      const profitAmount = totalPrice * (value / 100);
-      setCalculatedTotal(totalPrice + profitAmount);
     }
   };
 
