@@ -96,6 +96,9 @@ export default function Dashboard() {
             <Button variant="outline" className="w-full justify-start" onClick={() => navigate("/meals")}>
               Meals
             </Button>
+            <Button variant="outline" className="w-full justify-start" onClick={() => navigate("/additional_services")}>
+              Additional Items
+            </Button>
           </div>
 
           {/* Summary and Additional Services */}
