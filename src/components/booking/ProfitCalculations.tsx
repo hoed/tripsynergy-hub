@@ -2,6 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calculator } from "lucide-react";
 import { formatToIDR } from "@/utils/currency";
+import { useState } from "react";
+import { ProfitCalculations } from "./ProfitCalculations";
 
 interface ProfitCalculationsProps {
   isStaff: boolean;
@@ -66,3 +68,31 @@ export function ProfitCalculations({
     </div>
   );
 }
+
+const ParentComponent = () => {
+  const [currentProfit, setCurrentProfit] = useState<number>(0);
+  const [pricePerPax, setPricePerPax] = useState<number>(100); // Example value
+  const [totalWithProfit, setTotalWithProfit] = useState<number>(0);
+
+  const handleProfitChange = (value: number) => {
+    setCurrentProfit(value);
+  };
+
+  const handleCalculate = () => {
+    const profitAmount = pricePerPax * (currentProfit / 100);
+    setTotalWithProfit(pricePerPax + profitAmount);
+  };
+
+  return (
+    <ProfitCalculations
+      isStaff={true}
+      currentProfit={currentProfit}
+      pricePerPax={pricePerPax}
+      onProfitChange={handleProfitChange}
+      onCalculate={handleCalculate}
+      totalWithProfit={totalWithProfit}
+    />
+  );
+};
+
+export default ParentComponent;
