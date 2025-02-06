@@ -39,37 +39,53 @@ export function ServiceCard({
   isStaff,
   onDelete 
 }: ServiceCardProps) {
-  const [showBookingDialog, setShowBookingDialog] = useState<boolean>(false);
+  const [showBookingDialog, setShowBookingDialog] = useState(false);
 
   return (
     <>
-      <Card className="w-full">
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <CardTitle>{title}</CardTitle>
-            <div className="flex items-center gap-2">
-              <span className="text-primary">{formatToIDR(price)} {priceLabel}</span>
-              {isStaff && (
-                <DeleteServiceButton
-                  service={service}
-                  serviceType={serviceType}
-                  onDelete={onDelete}
-                />
+      <Card className="group w-full h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+        <CardHeader className="space-y-2">
+          <div className="flex justify-between items-start gap-4">
+            <div className="space-y-1">
+              <CardTitle className="text-xl font-semibold line-clamp-2 text-primary">
+                {title}
+              </CardTitle>
+              {location && (
+                <CardDescription className="flex items-center gap-1 text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  <span className="line-clamp-1">{location}</span>
+                </CardDescription>
               )}
             </div>
+            <div className="flex flex-col items-end gap-2">
+              <span className="font-semibold text-lg text-primary whitespace-nowrap">
+                {formatToIDR(price)}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {priceLabel}
+              </span>
+            </div>
           </div>
-          {location && (
-            <CardDescription className="flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
-              {location}
-            </CardDescription>
-          )}
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">{description}</p>
-          <Button onClick={() => setShowBookingDialog(true)} className="w-full">
-            Book Now
-          </Button>
+        <CardContent className="space-y-6">
+          <p className="text-sm text-muted-foreground line-clamp-3">
+            {description || "No description available"}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              onClick={() => setShowBookingDialog(true)} 
+              className="w-full sm:flex-1 bg-primary hover:bg-primary/90"
+            >
+              Book Now
+            </Button>
+            {isStaff && (
+              <DeleteServiceButton
+                service={service}
+                serviceType={serviceType}
+                onDelete={onDelete}
+              />
+            )}
+          </div>
         </CardContent>
       </Card>
 
