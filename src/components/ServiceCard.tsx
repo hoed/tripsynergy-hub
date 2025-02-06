@@ -13,11 +13,12 @@ type Service =
   | Database["public"]["Tables"]["accommodations"]["Row"]
   | Database["public"]["Tables"]["transportation"]["Row"]
   | Database["public"]["Tables"]["attractions"]["Row"]
-  | Database["public"]["Tables"]["meals"]["Row"];
+  | Database["public"]["Tables"]["meals"]["Row"]
+  | Database["public"]["Tables"]["additional_service"]["Row"];
 
-type ServiceType = "accommodations" | "transportation" | "attractions" | "meals";
+type ServiceType = "accommodations" | "transportation" | "attractions" | "meals" | "additional_services";
 
-type BookingReferenceColumn = "accommodation_id" | "transportation_id" | "attraction_id" | "meal_id";
+type BookingReferenceColumn = "accommodation_id" | "transportation_id" | "attraction_id" | "meal_id" | "additional_service_id";
 
 const getBookingReferenceColumn = (serviceType: ServiceType): BookingReferenceColumn => {
   switch (serviceType) {
@@ -29,6 +30,10 @@ const getBookingReferenceColumn = (serviceType: ServiceType): BookingReferenceCo
       return "attraction_id";
     case "meals":
       return "meal_id";
+    case "meals":
+    return "additional_service_id";
+    default:
+    throw new Error("Invalid service type");
   }
 };
 
