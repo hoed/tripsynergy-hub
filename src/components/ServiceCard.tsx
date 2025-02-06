@@ -14,7 +14,7 @@ type Service =
   | Database["public"]["Tables"]["transportation"]["Row"]
   | Database["public"]["Tables"]["attractions"]["Row"]
   | Database["public"]["Tables"]["meals"]["Row"]
-  | Database["public"]["Tables"]["additional_service"]["Row"];
+  | Database["public"]["Tables"]["additional_services"]["Row"];
 
 type ServiceType = "accommodations" | "transportation" | "attractions" | "meals" | "additional_services";
 
@@ -30,10 +30,10 @@ const getBookingReferenceColumn = (serviceType: ServiceType): BookingReferenceCo
       return "attraction_id";
     case "meals":
       return "meal_id";
-    case "meals":
-    return "additional_service_id";
+    case "additional_services":
+      return "additional_service_id";
     default:
-    throw new Error("Invalid service type");
+      throw new Error("Invalid service type");
   }
 };
 
@@ -67,7 +67,6 @@ export function ServiceCard({
     try {
       const bookingColumn = getBookingReferenceColumn(serviceType);
       
-      // First, check if we have staff permissions
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -93,7 +92,6 @@ export function ServiceCard({
         return;
       }
 
-      // First, delete all associated bookings
       const { error: bookingsError } = await supabase
         .from('bookings')
         .delete()
@@ -104,7 +102,6 @@ export function ServiceCard({
         throw bookingsError;
       }
 
-      // Then delete the service itself
       const { error: serviceError } = await supabase
         .from(serviceType)
         .delete()
