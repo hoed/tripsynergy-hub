@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MapPin } from "lucide-react";
-import { BookingForm } from "../BookingForm";
+import { BookingForm } from "@/components/BookingForm";
 import { Database } from "@/integrations/supabase/types";
 import { formatToIDR } from "@/utils/currency";
-import { DeleteServiceButton } from "./DeleteServiceButton";
+import { DeleteServiceButton } from "@/components/service/DeleteServiceButton";
 
 type Service = 
   | Database["public"]["Tables"]["accommodations"]["Row"]
