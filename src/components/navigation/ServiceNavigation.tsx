@@ -1,13 +1,5 @@
 import { Hotel, Bus, MapPin, Utensils, Package } from "lucide-react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 export const serviceTypes = [
   { value: "accommodations", label: "Accommodations", icon: Hotel },
@@ -43,13 +35,15 @@ export function ServiceNavigation({ selectedTab, setSelectedTab, isMobile }: Ser
   }
 
   return (
-    <TabsList className="grid w-full max-w-3xl grid-cols-4">
+    <TabsList className="grid w-full max-w-3xl grid-cols-5 gap-2">
       {serviceTypes.map((service) => (
         <TabsTrigger
           key={service.value}
           value={service.value}
+          className="flex items-center gap-2"
           onClick={() => setSelectedTab(service.value)}
         >
+          <service.icon className="h-4 w-4" />
           {service.label}
         </TabsTrigger>
       ))}
