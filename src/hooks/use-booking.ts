@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
@@ -15,9 +15,13 @@ export function useBookingSummary() {
     fetchBookingsAndCalculate
   } = useBookingData(user?.id);
 
-  useEffect(() => {
-    const checkStaffStatus = async () => {
-      if (!user) return;
+  const checkStaffStatus = useCallback(async () => {
+    if (!user) {
+      setIsStaff(false);
+      return;
+    }
+    
+    try {
       const { data: role, error } = await supabase
         .from('profiles')
         .select('role')
@@ -30,55 +34,76 @@ export function useBookingSummary() {
       }
 
       setIsStaff(role?.role === 'owner' || role?.role === 'operator');
-    };
-    checkStaffStatus();
+    } catch (error) {
+      console.error('Error in checkStaffStatus:', error);
+    }
   }, [user]);
 
-  const handleProfitUpdate = async (bookingId: string, newProfit: number) => {
-    const { error } = await supabase
-      .from('bookings')
-      .update({ profit_percentage: newProfit })
-      .eq('id', bookingId);
+  useEffect(() => {
+    checkStaffStatus();
+  }, [checkStaffStatus]);
 
-    if (error) {
+  const handleProfitUpdate = async (bookingId: string, newProfit: number) => {
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ profit_percentage: newProfit })
+        .eq('id', bookingId);
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update profit percentage",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Profit percentage updated successfully",
+        });
+        fetchBookingsAndCalculate();
+      }
+    } catch (error) {
+      console.error('Error in handleProfitUpdate:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profit percentage",
+        description: "An unexpected error occurred",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Profit percentage updated successfully",
-      });
-      fetchBookingsAndCalculate();
     }
   };
 
   const handleDeleteItem = async (bookingId: string) => {
-    const { error } = await supabase
-      .from('bookings')
-      .delete()
-      .eq('id', bookingId);
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', bookingId);
 
-    if (error) {
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete item",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Item deleted successfully",
+        });
+        fetchBookingsAndCalculate();
+      }
+    } catch (error) {
+      console.error('Error in handleDeleteItem:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete item",
+        description: "An unexpected error occurred",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Item deleted successfully",
-      });
-      fetchBookingsAndCalculate();
     }
   };
 
   useEffect(() => {
-    fetchBookingsAndCalculate();
-
     const channel = supabase
       .channel('booking-changes')
       .on(
@@ -97,7 +122,7 @@ export function useBookingSummary() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [fetchBookingsAndCalculate]);
 
   return {
     summaryItems,
