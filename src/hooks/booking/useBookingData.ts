@@ -53,38 +53,19 @@ export function useBookingData(userId: string | undefined) {
         `)
         .eq('client_id', userId);
 
-      if (error) {
-        console.error('Error fetching bookings:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch bookings",
-        });
-        return;
-      }
+      if (error) throw error;
 
-      if (!bookings || bookings.length === 0) {
-        setSummaryItems([]);
-        setTotalPrice(0);
-        setTotalWithProfit(0);
-        return;
-      }
-
-      const items: SummaryItem[] = [];
-
-      bookings.forEach(booking => {
+      const items: SummaryItem[] = (bookings || []).map(booking => {
         const calculatedPrice = calculateItemPrice(booking);
-        if (calculatedPrice) {
-          items.push({
-            name: calculatedPrice.name,
-            price: calculatedPrice.price,
-            type: calculatedPrice.type,
-            bookingId: booking.id,
-            profitPercentage: booking.profit_percentage,
-            startDate: booking.start_date,
-            endDate: booking.end_date
-          });
-        }
+        return {
+          name: calculatedPrice.name,
+          price: calculatedPrice.price,
+          type: calculatedPrice.type,
+          bookingId: booking.id,
+          profitPercentage: booking.profit_percentage,
+          startDate: booking.start_date,
+          endDate: booking.end_date
+        };
       });
 
       setSummaryItems(items);
@@ -95,13 +76,35 @@ export function useBookingData(userId: string | undefined) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "Failed to fetch booking data"
       });
     }
   }, [userId, calculateItemPrice, calculateTotalPrice, calculateTotalWithProfit, toast]);
 
   useEffect(() => {
-    fetchBookingsAndCalculate();
+    let mounted = true;
+
+    if (mounted) {
+      fetchBookingsAndCalculate();
+    }
+
+    const channel = supabase
+      .channel('booking-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings' },
+        () => {
+          if (mounted) {
+            fetchBookingsAndCalculate();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
   }, [fetchBookingsAndCalculate]);
 
   return {

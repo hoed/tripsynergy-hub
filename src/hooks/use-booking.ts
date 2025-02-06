@@ -6,6 +6,7 @@ import { useBookingData } from "./booking/useBookingData";
 
 export function useBookingSummary() {
   const [isStaff, setIsStaff] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
   const {
@@ -28,16 +29,20 @@ export function useBookingSummary() {
         .eq('id', user.id)
         .single();
       
-      if (error) {
-        console.error('Error fetching user role:', error);
-        return;
-      }
+      if (error) throw error;
 
       setIsStaff(role?.role === 'owner' || role?.role === 'operator');
     } catch (error) {
       console.error('Error in checkStaffStatus:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to check staff status"
+      });
+    } finally {
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [user, toast]);
 
   useEffect(() => {
     checkStaffStatus();
@@ -50,25 +55,19 @@ export function useBookingSummary() {
         .update({ profit_percentage: newProfit })
         .eq('id', bookingId);
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update profit percentage",
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "Profit percentage updated successfully",
-        });
-        fetchBookingsAndCalculate();
-      }
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Profit percentage updated successfully",
+      });
+      fetchBookingsAndCalculate();
     } catch (error) {
       console.error('Error in handleProfitUpdate:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "Failed to update profit percentage"
       });
     }
   };
@@ -80,55 +79,29 @@ export function useBookingSummary() {
         .delete()
         .eq('id', bookingId);
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to delete item",
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "Item deleted successfully",
-        });
-        fetchBookingsAndCalculate();
-      }
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Item deleted successfully",
+      });
+      fetchBookingsAndCalculate();
     } catch (error) {
       console.error('Error in handleDeleteItem:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "Failed to delete item"
       });
     }
   };
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('booking-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'bookings'
-        },
-        () => {
-          fetchBookingsAndCalculate();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchBookingsAndCalculate]);
 
   return {
     summaryItems,
     totalPrice,
     totalWithProfit,
     isStaff,
+    isLoading,
     handleProfitUpdate,
     handleDeleteItem
   };
