@@ -22,31 +22,33 @@ interface BookingListProps {
 }
 
 export function BookingList({ 
-  items = [], // Provide default empty array
+  items, 
   isStaff, 
   onProfitUpdate, 
   onDeleteItem, 
   totalPrice 
 }: BookingListProps) {
-  const [currentProfit, setCurrentProfit] = useState<number>(0);
+  const [currentProfit, setCurrentProfit] = useState<number>(items[0]?.profitPercentage || 0);
   const [calculatedTotal, setCalculatedTotal] = useState<number>(totalPrice);
   const [numberOfPersons, setNumberOfPersons] = useState<number>(1);
 
   useEffect(() => {
-    if (items.length > 0 && items[0].profitPercentage !== undefined) {
+    if (items[0]?.profitPercentage) {
+      const profitAmount = totalPrice * (items[0].profitPercentage / 100);
+      setCalculatedTotal(totalPrice + profitAmount);
       setCurrentProfit(items[0].profitPercentage);
+    } else {
+      setCalculatedTotal(totalPrice);
+      setCurrentProfit(0);
     }
-  }, [items]);
-
-  useEffect(() => {
-    const profitAmount = totalPrice * (currentProfit / 100);
-    setCalculatedTotal(totalPrice + profitAmount);
-  }, [totalPrice, currentProfit]);
+  }, [items, totalPrice]);
 
   const handleProfitChange = (value: number) => {
     setCurrentProfit(value);
     if (items[0]?.bookingId) {
       onProfitUpdate(items[0].bookingId, value);
+      const profitAmount = totalPrice * (value / 100);
+      setCalculatedTotal(totalPrice + profitAmount);
     }
   };
 
@@ -56,6 +58,7 @@ export function BookingList({
   };
 
   const handleDelete = async (bookingId: string) => {
+    // Delete the item from Supabase database
     const { error } = await supabase
       .from('bookings')
       .delete()
@@ -66,6 +69,7 @@ export function BookingList({
       return;
     }
 
+    // Call the onDeleteItem function to update the state in the parent component
     onDeleteItem(bookingId);
   };
 
