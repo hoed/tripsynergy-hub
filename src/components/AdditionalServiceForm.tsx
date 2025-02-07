@@ -61,7 +61,7 @@ export function AdditionalServiceForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Add Additional Service</CardTitle>
+        <CardTitle>Add Additional Items</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,7 +105,7 @@ export function AdditionalServiceForm() {
             Total Price: {formatToIDR(totalPrice)}
           </div>
           <Button type="submit" className="w-full">
-            Add Service
+            Create Service
           </Button>
         </form>
       </CardContent>
