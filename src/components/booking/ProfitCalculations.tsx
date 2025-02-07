@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calculator } from "lucide-react";
@@ -20,10 +21,12 @@ export function ProfitCalculations({
   onCalculate,
   totalWithProfit,
 }: ProfitCalculationsProps) {
-  if (!isStaff) return null;
+  useEffect(() => {
+    const profitAmount = (pricePerPax * currentProfit) / 100;
+    onProfitChange(pricePerPax + profitAmount);
+  }, [currentProfit, pricePerPax, onProfitChange]);
 
-  const profitAmount = pricePerPax * (currentProfit / 100);
-  const totalPriceWithProfit = pricePerPax + profitAmount;
+  if (!isStaff) return null;
 
   return (
     <div className="space-y-2">
@@ -51,12 +54,12 @@ export function ProfitCalculations({
 
       <div className="flex justify-between items-center">
         <p className="font-semibold">Profit</p>
-        <p className="font-semibold">{formatToIDR(profitAmount)}</p>
+        <p className="font-semibold">{formatToIDR((pricePerPax * currentProfit) / 100)}</p>
       </div>
 
       <div className="flex justify-between items-center">
         <p className="font-semibold">Total Price</p>
-        <p className="font-semibold">{formatToIDR(totalPriceWithProfit)}</p>
+        <p className="font-semibold">{formatToIDR(totalWithProfit)}</p>
       </div>
 
       <div className="flex justify-between items-center">

@@ -10,7 +10,6 @@ interface BookingSummaryCalculationsProps {
   numberOfPersons: number;
   onProfitChange: (value: number) => void;
   onPersonsChange: (value: number) => void;
-  onCalculate: () => void;
   calculatedTotal: number;
 }
 
@@ -21,7 +20,6 @@ export function BookingSummaryCalculations({
   numberOfPersons,
   onProfitChange,
   onPersonsChange,
-  onCalculate,
   calculatedTotal,
 }: BookingSummaryCalculationsProps) {
   const [pricePerPax, setPricePerPax] = useState<number>(0);
@@ -60,7 +58,6 @@ export function BookingSummaryCalculations({
         currentProfit={currentProfit}
         pricePerPax={pricePerPax}
         onProfitChange={onProfitChange}
-        onCalculate={onCalculate}
         totalWithProfit={calculatedTotal}
       />
     </div>
