@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 import { useBookingData } from "./booking/useBookingData";
+import { formatToIDR } from "@/utils/currency";
 
 export function useBookingSummary() {
   const [isStaff, setIsStaff] = useState<boolean>(false);
