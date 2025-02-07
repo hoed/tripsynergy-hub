@@ -16,31 +16,13 @@ interface ServiceNavigationProps {
 }
 
 export function ServiceNavigation({ selectedTab, setSelectedTab, isMobile }: ServiceNavigationProps) {
-  if (isMobile) {
-    return (
-      <TabsList className="grid w-full grid-cols-2 gap-2">
-        {serviceTypes.map((service) => (
-          <TabsTrigger
-            key={service.value}
-            value={service.value}
-            className="flex items-center gap-2"
-            onClick={() => setSelectedTab(service.value)}
-          >
-            <service.icon className="h-4 w-4" />
-            {service.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    );
-  }
-
   return (
-    <TabsList className="grid w-full max-w-3xl grid-cols-5 gap-2">
+    <TabsList className={`grid w-full gap-2 ${isMobile ? 'grid-cols-2' : 'grid-cols-5'}`}>
       {serviceTypes.map((service) => (
         <TabsTrigger
           key={service.value}
           value={service.value}
-          className="flex items-center gap-2"
+          className={`flex items-center gap-2 ${selectedTab === service.value ? 'bg-accent text-accent-foreground' : ''}`}
           onClick={() => setSelectedTab(service.value)}
         >
           <service.icon className="h-4 w-4" />
