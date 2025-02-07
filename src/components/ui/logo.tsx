@@ -28,7 +28,8 @@ export function Logo({ className, size = "md" }: LogoProps) {
         size === "md" && "text-lg md:text-xl",
         size === "lg" && "text-xl md:text-2xl"
       )}>
-        <p><a href="https://beyourtour.xyz">Be Your Tour Travel System</a></p>
+        <a href="https://beyourtour.xyz">Be Your Tour</a>
+        <p></p>Travel System</p>
       </span>
     </div>
   );
