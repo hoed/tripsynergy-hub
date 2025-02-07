@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { formatToIDR } from "@/utils/currency";
 
@@ -21,10 +20,6 @@ export function ProfitCalculations({
 
   const profitAmount = pricePerPax * (currentProfit / 100);
   const totalPriceWithProfit = pricePerPax + profitAmount;
-
-  useEffect(() => {
-    onProfitChange(currentProfit);
-  }, [currentProfit, onProfitChange]);
 
   return (
     <div className="space-y-2">
