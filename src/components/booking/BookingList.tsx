@@ -53,19 +53,23 @@ export function BookingList({
   };
 
   const handleDelete = async (bookingId: string) => {
-    // Delete the item from Supabase database
-    const { error } = await supabase
-      .from('bookings')
-      .delete()
-      .eq('id', bookingId);
+    try {
+      // Delete the item from Supabase database
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', bookingId);
 
-    if (error) {
-      console.error("Error deleting booking:", error);
-      return;
+      if (error) {
+        console.error("Error deleting booking:", error);
+        return;
+      }
+
+      // Call the onDeleteItem function to update the state in the parent component
+      onDeleteItem(bookingId);
+    } catch (error) {
+      console.error("Failed to delete booking:", error);
     }
-
-    // Call the onDeleteItem function to update the state in the parent component
-    onDeleteItem(bookingId);
   };
 
   return (
