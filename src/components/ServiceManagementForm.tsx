@@ -12,6 +12,16 @@ interface ServiceManagementFormProps {
   onSuccess: () => void;
 }
 
+interface ServiceData {
+  name?: string;
+  description: string;
+  location?: string;
+  price_per_night?: number;
+  price_per_person?: number;
+  type?: string;
+  created_by: string;
+}
+
 export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagementFormProps) {
   const { user } = useAuth();
   const { 
@@ -28,7 +38,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
     setIsSubmitting(true);
 
     try {
-      let serviceData;
+      let serviceData: ServiceData;
       const total = calculateTotal(data);
       
       if (serviceType === "accommodations") {
@@ -65,7 +75,7 @@ export function ServiceManagementForm({ serviceType, onSuccess }: ServiceManagem
       form.reset();
       onSuccess();
     } catch (error: any) {
-      console.error("Error creating service:", error);
+      console.error("Error creating service:", error.message);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,17 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { formatToIDR } from "@/utils/currency";
 
 export function AdditionalServiceForm() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [pricePerPerson, setPricePerPerson] = useState("");
+  const [pricePerItem, setPricePerItem] = useState("");
   const [days, setDays] = useState("1");
+  const [totalPrice, setTotalPrice] = useState(0);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const price = parseFloat(pricePerItem) || 0;
+    const dayCount = parseInt(days) || 1;
+    setTotalPrice(price * dayCount);
+  }, [pricePerItem, days]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +31,7 @@ export function AdditionalServiceForm() {
           {
             name,
             description,
-            price_per_person: parseFloat(pricePerPerson),
+            price_per_item: parseFloat(pricePerItem),
             days: parseInt(days),
           }
         ]);
@@ -38,8 +46,9 @@ export function AdditionalServiceForm() {
       // Reset form
       setName("");
       setDescription("");
-      setPricePerPerson("");
+      setPricePerItem("");
       setDays("1");
+      setTotalPrice(0);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -74,9 +83,9 @@ export function AdditionalServiceForm() {
           <div>
             <Input
               type="number"
-              placeholder="Price per Person"
-              value={pricePerPerson}
-              onChange={(e) => setPricePerPerson(e.target.value)}
+              placeholder="Price per Item"
+              value={pricePerItem}
+              onChange={(e) => setPricePerItem(e.target.value)}
               required
               min="0"
               step="0.01"
@@ -91,6 +100,9 @@ export function AdditionalServiceForm() {
               required
               min="1"
             />
+          </div>
+          <div className="text-lg font-semibold">
+            Total Price: {formatToIDR(totalPrice)}
           </div>
           <Button type="submit" className="w-full">
             Add Service
