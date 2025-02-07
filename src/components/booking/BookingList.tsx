@@ -78,7 +78,7 @@ export function BookingList({
       {items.map((item, index) => (
         <div key={index} className="flex items-start justify-between gap-4">
           <BookingItem item={item} />
-          {isStaff && item.bookingId && (
+          {item.bookingId && (
             <Button
               variant="destructive"
               size="icon"
@@ -97,7 +97,6 @@ export function BookingList({
         numberOfPersons={numberOfPersons}
         onProfitChange={handleProfitChange}
         onPersonsChange={setNumberOfPersons}
-        onCalculate={handleCalculate}
         calculatedTotal={calculatedTotal}
       />
     </div>
