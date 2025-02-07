@@ -1,6 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Calculator } from "lucide-react";
 import { formatToIDR } from "@/utils/currency";
 
 interface ProfitCalculationsProps {
@@ -8,7 +6,6 @@ interface ProfitCalculationsProps {
   currentProfit: number;
   pricePerPax: number;
   onProfitChange: (value: number) => void;
-  onCalculate: () => void;
   totalWithProfit: number;
 }
 
@@ -17,7 +14,6 @@ export function ProfitCalculations({
   currentProfit,
   pricePerPax,
   onProfitChange,
-  onCalculate,
   totalWithProfit,
 }: ProfitCalculationsProps) {
   if (!isStaff) return null;
@@ -43,10 +39,6 @@ export function ProfitCalculations({
           }}
         />
         <span className="text-sm text-muted-foreground">%</span>
-        <Button variant="outline" size="sm" onClick={onCalculate}>
-          <Calculator className="h-4 w-4 mr-2" />
-          Calculate
-        </Button>
       </div>
 
       <div className="flex justify-between items-center">
