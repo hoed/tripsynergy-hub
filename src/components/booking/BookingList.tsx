@@ -52,11 +52,6 @@ export function BookingList({
     }
   };
 
-  const handleCalculate = () => {
-    const profitAmount = totalPrice * (currentProfit / 100);
-    setCalculatedTotal(totalPrice + profitAmount);
-  };
-
   const handleDelete = async (bookingId: string) => {
     // Delete the item from Supabase database
     const { error } = await supabase
@@ -78,7 +73,7 @@ export function BookingList({
       {items.map((item, index) => (
         <div key={index} className="flex items-start justify-between gap-4">
           <BookingItem item={item} />
-          {isStaff && item.bookingId && (
+          {item.bookingId && (
             <Button
               variant="destructive"
               size="icon"
@@ -97,7 +92,6 @@ export function BookingList({
         numberOfPersons={numberOfPersons}
         onProfitChange={handleProfitChange}
         onPersonsChange={setNumberOfPersons}
-        onCalculate={handleCalculate}
         calculatedTotal={calculatedTotal}
       />
     </div>
