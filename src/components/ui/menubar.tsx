@@ -22,7 +22,11 @@ const Menubar = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-10 items-center space-x-1 rounded-md border bg-background p-1",
-      className
+      className,
+      "md:flex-row", // Default to row layout for medium and larger screens
+      "sm:flex-col", // Stack vertically for small screens
+      "sm:items-start", // Align items to the start for small screens
+      "sm:h-auto" // Adjust height for small screens
     )}
     {...props}
   />
@@ -37,7 +41,9 @@ const MenubarTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-default select-none items-center rounded-sm px-3 py-1.5 text-sm font-medium outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
-      className
+      className,
+      "sm:w-full", // Make trigger full width on small screens
+      "sm:justify-center" // Center the content on small screens
     )}
     {...props}
   />
@@ -55,7 +61,9 @@ const MenubarSubTrigger = React.forwardRef<
     className={cn(
       "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
       inset && "pl-8",
-      className
+      className,
+      "sm:w-full", // Make subtrigger full width on small screens
+      "sm:justify-center" // Center the content on small screens
     )}
     {...props}
   >
