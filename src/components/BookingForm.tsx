@@ -38,10 +38,6 @@ export function BookingForm({ service, serviceType, onSuccess, onCancel }: Booki
     if ('price_per_night' in service) {
       return service.price_per_night * days;
     } else if ('price_per_person' in service) {
-      if (serviceType === 'transportation') {
-        // For transportation, we don't multiply by days
-        return service.price_per_person * numberOfPeople;
-      }
       return service.price_per_person * numberOfPeople * days;
     }
     
