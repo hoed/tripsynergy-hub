@@ -52,24 +52,25 @@ export function BookingList({
     }
   };
 
+  const handleCalculate = () => {
+    const profitAmount = totalPrice * (currentProfit / 100);
+    setCalculatedTotal(totalPrice + profitAmount);
+  };
+
   const handleDelete = async (bookingId: string) => {
-    try {
-      // Delete the item from Supabase database
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .eq('id', bookingId);
+    // Delete the item from Supabase database
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', bookingId);
 
-      if (error) {
-        console.error("Error deleting booking:", error);
-        return;
-      }
-
-      // Call the onDeleteItem function to update the state in the parent component
-      onDeleteItem(bookingId);
-    } catch (error) {
-      console.error("Failed to delete booking:", error);
+    if (error) {
+      console.error("Error deleting booking:", error);
+      return;
     }
+
+    // Call the onDeleteItem function to update the state in the parent component
+    onDeleteItem(bookingId);
   };
 
   return (
@@ -77,7 +78,7 @@ export function BookingList({
       {items.map((item, index) => (
         <div key={index} className="flex items-start justify-between gap-4">
           <BookingItem item={item} />
-          {item.bookingId && (
+          {isStaff && item.bookingId && (
             <Button
               variant="destructive"
               size="icon"
@@ -96,6 +97,7 @@ export function BookingList({
         numberOfPersons={numberOfPersons}
         onProfitChange={handleProfitChange}
         onPersonsChange={setNumberOfPersons}
+        onCalculate={handleCalculate}
         calculatedTotal={calculatedTotal}
       />
     </div>
