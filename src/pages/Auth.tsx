@@ -160,13 +160,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/background.gif')" }}>
+      <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="flex flex-col items-center justify-center">
           <Logo size="lg" className="w-auto h-16 md:h-20 mb-8" />
         </div>
         
-        <Card className="w-full">
+        <Card className="w-full bg-custom-dark">
           <CardHeader>
             <CardTitle className="text-center">Welcome</CardTitle>
             <CardDescription className="text-center">
